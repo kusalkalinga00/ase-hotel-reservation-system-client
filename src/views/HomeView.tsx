@@ -4,7 +4,7 @@ import React from "react";
 const HomeView = () => {
   return (
     <div>
-      <Button>Click Me</Button>
+      {/* <Button>Click Me</Button> */}
     </div>
   );
 };
