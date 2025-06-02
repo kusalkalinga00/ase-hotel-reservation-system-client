@@ -54,7 +54,7 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
 
   return (
     <Card
-      className="overflow-hidden  transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+      className="overflow-hidden  transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-white dark:bg-[#020517] border-gray-200 dark:border-gray-700"
       //   onClick={() => onClick?.(id)}
     >
       <div className="relative">

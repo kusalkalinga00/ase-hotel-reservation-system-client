@@ -10,22 +10,28 @@ const HomeView = () => {
     // Here you would typically navigate to room details or booking page
     alert(`Navigating to room details for ${roomId}`);
   };
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Our Rooms & Suites
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          Choose from our carefully designed accommodations, each offering
-          comfort, style, and modern amenities for an unforgettable stay.
-        </p>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-        {roomsData.map((room) => (
-          <RoomCard key={room.id} {...room} onClick={handleRoomClick} />
-        ))}
+  //   bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900
+  return (
+    <div className="min-h-screen bg-[url(/assets/home-background/home-bg.jpg)] bg-no-repeat bg-center bg-cover ">
+      <div className="backdrop-blur-md bg-black/20 ">
+        <div className="container mx-auto px-4 py-8 h-screen ">
+          <div className="text-center mt-4 mb-10">
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Our Rooms & Suites
+            </h1>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              Choose from our carefully designed accommodations, each offering
+              comfort, style, and modern amenities for an unforgettable stay.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 mt-2">
+            {roomsData.map((room) => (
+              <RoomCard key={room.id} {...room} onClick={handleRoomClick} />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
