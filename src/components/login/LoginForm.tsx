@@ -26,10 +26,15 @@ import {
   LoginUserSchemaType,
 } from "@/zod-schema/login-user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
+import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 const LoginForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<LoginUserSchemaType>({
     resolver: zodResolver(LoginUserSchema),
@@ -39,8 +44,26 @@ const LoginForm = () => {
     },
   });
 
-  const onSubmit = (data: LoginUserSchemaType) => {
-    console.log("Form submitted with data:", data);
+  const onSubmit = async (data: LoginUserSchemaType) => {
+    setLoading(true);
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+      const redirectUrl = searchParams.get("redirect_url") || "/";
+      if (result?.ok) {
+        toast.success("Login successful!");
+        router.push(redirectUrl);
+      } else {
+        toast.error(result?.error || "Invalid email or password");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -68,6 +91,7 @@ const LoginForm = () => {
                         type="email"
                         placeholder="m@example.com"
                         required
+                        disabled={loading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -86,6 +110,7 @@ const LoginForm = () => {
                         className="text-xs text-blue-600 hover:underline focus:outline-none"
                         onClick={() => setShowPassword((prev) => !prev)}
                         tabIndex={-1}
+                        disabled={loading}
                       >
                         {showPassword ? "Hide" : "Show"}
                       </button>
@@ -96,6 +121,7 @@ const LoginForm = () => {
                         id="password"
                         type={showPassword ? "text" : "password"}
                         required
+                        disabled={loading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -104,15 +130,16 @@ const LoginForm = () => {
               />
             </div>
             <div className="mt-6 flex flex-col gap-2">
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
               </Button>
               <div className="text-center text-xs">or</div>
               <Button
-                type="submit"
+                type="button"
                 className="w-full"
                 variant={"outline"}
                 onClick={() => router.push("/register")}
+                disabled={loading}
               >
                 Sign up
               </Button>
