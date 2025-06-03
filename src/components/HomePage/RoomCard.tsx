@@ -59,7 +59,7 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
     >
       <div className="relative">
         <img
-          src={image || "/placeholder.svg"}
+          src={image || ""}
           alt={name}
           className="w-full h-48 object-cover"
         />

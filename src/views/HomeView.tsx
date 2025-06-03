@@ -1,17 +1,21 @@
 "use client";
 import RoomCard from "@/components/HomePage/RoomCard";
-import { Button } from "@/components/ui/button";
 import { roomsData } from "@/data";
-import React from "react";
+import React, { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 const HomeView = () => {
+  const session = useSession();
+
+  useEffect(() => {
+    console.log("Session data:", session);
+  }, [session]);
+
   const handleRoomClick = (roomId: string) => {
     console.log(`Room clicked: ${roomId}`);
-    // Here you would typically navigate to room details or booking page
     alert(`Navigating to room details for ${roomId}`);
   };
 
-  //   bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900
   return (
     <div className="min-h-screen bg-[url(/assets/home-background/home-bg.jpg)] bg-no-repeat bg-center bg-cover ">
       <div className="backdrop-blur-sm bg-black/30">
