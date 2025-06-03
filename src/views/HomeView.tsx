@@ -14,7 +14,7 @@ const HomeView = () => {
   //   bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900
   return (
     <div className="min-h-screen bg-[url(/assets/home-background/home-bg.jpg)] bg-no-repeat bg-center bg-cover ">
-      <div className="backdrop-blur-md bg-black/20 ">
+      <div className="backdrop-blur-sm bg-black/30">
         <div className="container mx-auto px-4 py-8 h-screen ">
           <div className="text-center mt-4 mb-10">
             <h1 className="text-3xl font-bold text-white mb-2">
