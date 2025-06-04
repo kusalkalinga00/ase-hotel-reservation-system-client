@@ -84,10 +84,10 @@ const RegisterForm = () => {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Register account</CardTitle>
+        {/* <CardTitle >Register account</CardTitle>
         <CardDescription>
           Enter your details below to create a new account
-        </CardDescription>
+        </CardDescription> */}
       </CardHeader>
       <CardContent>
         <Form {...form}>
