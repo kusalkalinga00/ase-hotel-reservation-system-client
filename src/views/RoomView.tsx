@@ -33,6 +33,9 @@ import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { useQuery } from "@tanstack/react-query";
 import { ApiResponse } from "@/types/api.types";
 import { Separator } from "@/components/ui/separator";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const amenityIcons = {
   wifi: Wifi,
@@ -75,8 +78,10 @@ interface RoomViewProps {
 const RoomView: React.FC<RoomViewProps> = (props) => {
   const { roomCategoryId } = props;
   const axiosAuth = useAxiosAuth();
+  const { data: session } = useSession();
+  const router = useRouter();
 
-  const fetchAllRoomsCategories = async () => {
+  const fetchAllRoomsCategory = async () => {
     const response = await axiosAuth.get(`/room-categories/${roomCategoryId}`);
     return response.data;
   };
@@ -87,7 +92,7 @@ const RoomView: React.FC<RoomViewProps> = (props) => {
     isFetched,
   } = useQuery<ApiResponse<RoomCategory>>({
     queryKey: ["roomCategory", roomCategoryId],
-    queryFn: fetchAllRoomsCategories,
+    queryFn: fetchAllRoomsCategory,
     refetchOnWindowFocus: false,
     enabled: !!roomCategoryId,
   });
@@ -104,6 +109,17 @@ const RoomView: React.FC<RoomViewProps> = (props) => {
         return "Residential Suite";
       default:
         return "Unknown Type";
+    }
+  };
+
+  const handleBookFunction = () => {
+    if (!session?.user) {
+      toast.error("You must be logged in to book a room.");
+      router.push(`/login?redirect_url=/room/${roomCategoryId}`);
+      return;
+    } else {
+      router.push(`/room/${roomCategoryId}/reservation`);
+      return;
     }
   };
 
@@ -264,7 +280,11 @@ const RoomView: React.FC<RoomViewProps> = (props) => {
                         <Badge variant="outline" className="mb-4">
                           {roomType.payload.priceTier}
                         </Badge>
-                        <Button className="w-full" size="lg">
+                        <Button
+                          className="w-full"
+                          size="lg"
+                          onClick={handleBookFunction}
+                        >
                           Book Now
                         </Button>
                       </div>
