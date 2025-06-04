@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
-import CommonHeader from "@/components/common/CommonHeader";
-import CommonFooter from "@/components/common/CommonFooter";
 import { Toaster } from "@/components/ui/sonner";
 import AuthProvider from "@/providers/auth-provider";
 import ReactQueryProvider from "@/providers/react-query-provider";
@@ -41,9 +39,8 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <CommonHeader />
               {children}
-              <CommonFooter />
+
               <Toaster position="top-right" />
             </ThemeProvider>
           </ReactQueryProvider>

@@ -6,18 +6,23 @@ import { Button } from "@/components/ui/button";
 import { Users, Wifi, Car, Coffee, Tv, Bath } from "lucide-react";
 import React from "react";
 import { RoomCardProps } from "@/types/home.types";
+import { useRouter } from "next/navigation";
 
 const RoomCard: React.FC<RoomCardProps> = (props) => {
+  const router = useRouter();
   const {
     id,
-    type,
     name,
-    description,
-    image,
+    idealFor,
+    capacity,
+    size,
+    bed,
+    view,
     price,
-    maxOccupancy,
+    priceTier,
+    image,
+    description,
     amenities,
-    onClick,
   } = props;
 
   const getTypeColor = (type: string) => {
@@ -52,9 +57,13 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
     }
   };
 
+  const handleSeeMore = () => {
+    router.push(`/room/${id}`);
+  };
+
   return (
     <Card
-      className="overflow-hidden  transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-white dark:bg-[#020517] border-gray-200 dark:border-gray-700"
+      className="overflow-hidden  transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-white dark:bg-[#020517] border-gray-200 dark:border-gray-700 justify-between"
       //   onClick={() => onClick?.(id)}
     >
       <div className="relative">
@@ -63,8 +72,8 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
           alt={name}
           className="w-full h-48 object-cover"
         />
-        <Badge className={`absolute top-3 left-3 ${getTypeColor(type)}`}>
-          {type.replace("_", " ")}
+        <Badge className={`absolute top-3 left-3 ${getTypeColor(name)}`}>
+          {name.replace("_", " ")}
         </Badge>
       </div>
 
@@ -81,7 +90,7 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
 
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <Users className="h-4 w-4" />
-            <span>Up to {maxOccupancy} guests</span>
+            <span>Up to {capacity} guests</span>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -112,7 +121,9 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
             per night
           </div>
         </div>
-        <Button className="ml-4 cursor-pointer">Book Now</Button>
+        <Button className="ml-4 cursor-pointer" onClick={handleSeeMore}>
+          See More
+        </Button>
       </CardFooter>
     </Card>
   );
