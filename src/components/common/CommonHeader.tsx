@@ -19,16 +19,6 @@ import { useSession, signOut } from "next-auth/react";
 const CommonHeader = () => {
   const router = useRouter();
   const session = useSession();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    avatar: "",
-  });
-
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
 
   const handleLogout = () => {
     signOut();
@@ -97,13 +87,14 @@ const CommonHeader = () => {
                   className="relative h-10 w-10 rounded-full"
                 >
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.avatar || ""} alt={user.name} />
-                    <AvatarFallback>
-                      {user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
+                    {session.data && (
+                      <AvatarFallback>
+                        {session.data.user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -111,10 +102,10 @@ const CommonHeader = () => {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {user.name}
+                      {session.data.user.name || "Guest User"}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {user.email}
+                      {session.data.user.email || ""}
                     </p>
                   </div>
                 </DropdownMenuLabel>
