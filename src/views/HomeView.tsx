@@ -3,6 +3,7 @@ import RoomCard from "@/components/HomePage/RoomCard";
 import { roomsData } from "@/data";
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
 
 const HomeView = () => {
   const session = useSession();
@@ -18,8 +19,8 @@ const HomeView = () => {
 
   return (
     <div className="min-h-screen bg-[url(/assets/home-background/home-bg.jpg)] bg-no-repeat bg-center bg-cover ">
-      <div className="backdrop-blur-sm bg-black/30">
-        <div className="container mx-auto px-4 py-8 h-screen ">
+      <div className="backdrop-blur-sm bg-black/30 min-h-screen">
+        <div className="container mx-auto px-4 py-8 ">
           <div className="text-center mt-4 mb-10">
             <h1 className="text-3xl font-bold text-white mb-2">
               Our Rooms & Suites

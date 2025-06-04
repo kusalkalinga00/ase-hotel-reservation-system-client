@@ -6,6 +6,7 @@ import CommonHeader from "@/components/common/CommonHeader";
 import CommonFooter from "@/components/common/CommonFooter";
 import { Toaster } from "@/components/ui/sonner";
 import AuthProvider from "@/providers/auth-provider";
+import ReactQueryProvider from "@/providers/react-query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,17 +34,19 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-min`}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <CommonHeader />
-            {children}
-            <CommonFooter />
-            <Toaster position="top-right" />
-          </ThemeProvider>
+          <ReactQueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <CommonHeader />
+              {children}
+              <CommonFooter />
+              <Toaster position="top-right" />
+            </ThemeProvider>
+          </ReactQueryProvider>
         </body>
       </html>
     </AuthProvider>
