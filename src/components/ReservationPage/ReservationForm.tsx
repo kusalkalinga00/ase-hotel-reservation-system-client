@@ -4,13 +4,12 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Form,
   FormControl,
@@ -27,41 +26,59 @@ import {
   ReservationSchemaType,
 } from "@/zod-schema/reservation.schema";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { useSession } from "next-auth/react";
+import { MoveUp } from "lucide-react";
+import CreditCardForm, {
+  CreditCardFormHandle,
+} from "@/components/ReservationPage/CreditCardForm";
+import ReservationAlert from "../modals/ReservationAlert";
 
 const ReservationForm = () => {
   const router = useRouter();
   const [addCard, setAddCard] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
+  const session = useSession();
+  const creditCardFormRef = useRef<CreditCardFormHandle>(null);
+
   const form = useForm<ReservationSchemaType>({
-    resolver: zodResolver(ReservationSchema),
+    resolver: (data, context, options) =>
+      zodResolver(ReservationSchema)(data, { ...context, addCard }, options),
     defaultValues: {
-      name: "",
-      email: "",
+      name: session.data?.user.name || "",
+      email: session.data?.user.email || "",
       phone: "",
       checkInDate: "",
       checkOutDate: "",
       occupants: 1,
-      creditCardNumber: "",
-      creditCardExpiry: "",
-      creditCardCVV: "",
     },
   });
 
   const onSubmit = (values: ReservationSchemaType) => {
     toast.success("Reservation submitted successfully!");
-    // You can handle API submission here
-    // router.push('/confirmation');
+    console.log("Reservation Details:", values);
+  };
+
+  const handleReservationSubmit = async () => {
+    const reservationValid = await form.trigger();
+    if (!reservationValid) return;
+    const reservationData = form.getValues();
+    if (addCard) {
+      if (creditCardFormRef.current) {
+        const creditCardData = await creditCardFormRef.current.submit();
+        if (!creditCardData) return; // Credit card form invalid
+        console.log("reserved with credit card", {
+          ...reservationData,
+          ...creditCardData,
+        });
+      }
+    } else {
+      console.log("reserved without credit card", {
+        ...reservationData,
+        creditCardNumber: "",
+        creditCardExpiry: "",
+        creditCardCVV: "",
+      });
+    }
   };
 
   return (
@@ -82,7 +99,7 @@ const ReservationForm = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Your Name" {...field} />
+                    <Input placeholder="Your Name" {...field} disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -95,7 +112,7 @@ const ReservationForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="you@email.com" {...field} />
+                    <Input placeholder="you@email.com" {...field} disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -146,102 +163,84 @@ const ReservationForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Number of Guests</FormLabel>
-                  <FormControl>
-                    <Input type="number" min={1} max={20} {...field} />
-                  </FormControl>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      type="button"
+                      className="px-2 py-1 border rounded bg-gray-100 hover:bg-gray-200"
+                      variant={"outline"}
+                      size={"icon"}
+                      onClick={() =>
+                        field.onChange(Math.max(1, (field.value || 1) - 1))
+                      }
+                      aria-label="Decrease guests"
+                    >
+                      <MoveUp className="rotate-180" />
+                    </Button>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={20}
+                        {...field}
+                        className="no-spinner text-center w-16"
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value)
+                          )
+                        }
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant={"outline"}
+                      size={"icon"}
+                      className="px-2 py-1 border rounded bg-gray-100 hover:bg-gray-200"
+                      onClick={() =>
+                        field.onChange(Math.min(20, (field.value || 1) + 1))
+                      }
+                      aria-label="Increase guests"
+                    >
+                      <MoveUp className="" />
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex items-center space-x-2 pt-2">
-              <Checkbox
-                id="addCard"
-                checked={addCard}
-                onCheckedChange={(val) => {
-                  if (val === false) setShowAlert(true);
-                  setAddCard(val === true);
-                }}
-              />
-              <label
-                htmlFor="addCard"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Add credit card details
-              </label>
-            </div>
-            <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Notice</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    If user didn't enter credit card details by 7 pm, the
-                    reservation will cancel.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogAction
-                    onClick={() => setShowAlert(false)}
-                    autoFocus
-                  >
-                    OK
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            {addCard && (
-              <div className="space-y-4 pt-2">
-                <FormField
-                  control={form.control}
-                  name="creditCardNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Credit Card Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="1234 5678 9012 3456"
-                          maxLength={16}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="creditCardExpiry"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Expiry (MM/YY)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="MM/YY" maxLength={5} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="creditCardCVV"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>CVV</FormLabel>
-                      <FormControl>
-                        <Input placeholder="CVV" maxLength={3} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            )}
-
-            <Button type="submit" className="w-full">
-              Reserve
-            </Button>
           </CardContent>
         </form>
       </Form>
+      <div className="flex items-center gap-2 px-5 pt-2">
+        <Checkbox
+          id="addCard"
+          checked={addCard}
+          onCheckedChange={(val) => {
+            if (val === false) setShowAlert(true);
+            setAddCard(val === true);
+          }}
+        />
+        <label
+          htmlFor="addCard"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Add credit card details
+        </label>
+      </div>
+      {addCard && (
+        <div className="px-5 pb-5">
+          <CreditCardForm ref={creditCardFormRef} />
+        </div>
+      )}
+
+      <div className="px-5">
+        <Button className="w-full" onClick={handleReservationSubmit}>
+          Reserve
+        </Button>
+      </div>
+
+      <ReservationAlert showAlert={showAlert} setShowAlert={setShowAlert} />
     </Card>
   );
 };
