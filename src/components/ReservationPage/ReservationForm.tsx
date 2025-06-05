@@ -33,20 +33,34 @@ import CreditCardForm, {
 } from "@/components/ReservationPage/CreditCardForm";
 import ReservationAlert from "../modals/ReservationAlert";
 import { DateRange, DayPicker } from "react-day-picker";
+import { useMutation } from "@tanstack/react-query";
+import useAxiosAuth from "@/hooks/useAxiosAuth";
+import { AxiosError } from "axios";
+import { ApiResponse, ReservationResponsePayload } from "@/types/api.types";
 
 interface ReservationFormProps {
   maxOccupants: number;
+  roomType: string;
+}
+
+interface ReservationPayload {
+  roomType: string;
+  checkInDate: string;
+  checkOutDate: string;
+  occupants: number;
+  creditCard: string;
+  creditCardExpiry: string;
+  creditCardCVV: string;
 }
 
 const ReservationForm: React.FC<ReservationFormProps> = (props) => {
-  const { maxOccupants } = props;
+  const { maxOccupants, roomType } = props;
   const router = useRouter();
   const [addCard, setAddCard] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const session = useSession();
   const creditCardFormRef = useRef<CreditCardFormHandle>(null);
-  const [checkInTime, setCheckInTime] = useState<string>("");
-  const [checkOutTime, setCheckOutTime] = useState<string>("");
+  const axiosAuth = useAxiosAuth();
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
@@ -69,6 +83,23 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
     console.log("Reservation Details:", values);
   };
 
+  const handleReservationMutation = useMutation({
+    mutationFn: async (values: ReservationPayload) => {
+      const response = await axiosAuth.post("/reservations", values);
+      return response.data;
+    },
+
+    onSuccess: (data: ApiResponse<ReservationResponsePayload>) => {
+      toast.success(`${data.message}`);
+      console.log("Reservation created:", data);
+      // router.push("/reservations");
+    },
+    onError: (error: AxiosError<ApiResponse<null>>) => {
+      console.error("Error updating team", error);
+      toast.error(error.response?.data.message || "An error occurred");
+    },
+  });
+
   const handleReservationSubmit = async () => {
     const reservationValid = await form.trigger();
     if (!reservationValid) return;
@@ -81,11 +112,29 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
           ...reservationData,
           ...creditCardData,
         });
+        handleReservationMutation.mutate({
+          roomType,
+          checkInDate: reservationData.checkInDate,
+          checkOutDate: reservationData.checkOutDate,
+          occupants: reservationData.occupants,
+          creditCard: creditCardData.creditCardNumber,
+          creditCardExpiry: creditCardData.creditCardExpiry,
+          creditCardCVV: creditCardData.creditCardCVV,
+        });
       }
     } else {
       console.log("reserved without credit card", {
         ...reservationData,
         creditCardNumber: "",
+        creditCardExpiry: "",
+        creditCardCVV: "",
+      });
+      handleReservationMutation.mutate({
+        roomType,
+        checkInDate: reservationData.checkInDate,
+        checkOutDate: reservationData.checkOutDate,
+        occupants: reservationData.occupants,
+        creditCard: "",
         creditCardExpiry: "",
         creditCardCVV: "",
       });

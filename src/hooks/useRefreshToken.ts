@@ -13,7 +13,7 @@ export const useRefreshToken = () => {
     }
 
     try {
-      const res = await axios.post(`/api/v1/auth/refresh`, {
+      const res = await axios.post(`/auth/refresh`, {
         refresh_token: session.refreshToken,
       });
 

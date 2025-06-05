@@ -117,7 +117,10 @@ const ReservationView: React.FC<ReservationViewProps> = (props) => {
 
               {/* Reservation Form */}
               <div className="flex justify-start w-full">
-                <ReservationForm maxOccupants={roomType.payload.capacity} />
+                <ReservationForm
+                  maxOccupants={roomType.payload.capacity}
+                  roomType={roomType.payload.name}
+                />
               </div>
             </div>
           )}
