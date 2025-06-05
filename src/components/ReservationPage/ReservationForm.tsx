@@ -32,24 +32,35 @@ import CreditCardForm, {
   CreditCardFormHandle,
 } from "@/components/ReservationPage/CreditCardForm";
 import ReservationAlert from "../modals/ReservationAlert";
+import { DateRange, DayPicker } from "react-day-picker";
 
-const ReservationForm = () => {
+interface ReservationFormProps {
+  maxOccupants: number;
+}
+
+const ReservationForm: React.FC<ReservationFormProps> = (props) => {
+  const { maxOccupants } = props;
   const router = useRouter();
   const [addCard, setAddCard] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const session = useSession();
   const creditCardFormRef = useRef<CreditCardFormHandle>(null);
+  const [checkInTime, setCheckInTime] = useState<string>("");
+  const [checkOutTime, setCheckOutTime] = useState<string>("");
+
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const form = useForm<ReservationSchemaType>({
     resolver: (data, context, options) =>
       zodResolver(ReservationSchema)(data, { ...context, addCard }, options),
     defaultValues: {
-      name: session.data?.user.name || "",
-      email: session.data?.user.email || "",
+      name: "",
+      email: "",
       phone: "",
       checkInDate: "",
       checkOutDate: "",
       occupants: 1,
+      checkInTime: "",
     },
   });
 
@@ -80,6 +91,49 @@ const ReservationForm = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (session.data) {
+      form.setValue("name", session.data.user.name || "");
+      form.setValue("email", session.data.user.email || "");
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (dateRange?.from && dateRange?.to) {
+      const checkInTime = form.getValues("checkInTime") || "14:00";
+      const checkOutTime = "11:00";
+      const [checkInHour, checkInMinute] = checkInTime.split(":");
+      const checkInDateTime = new Date(
+        Date.UTC(
+          dateRange.from.getFullYear(),
+          dateRange.from.getMonth(),
+          dateRange.from.getDate(),
+          Number(checkInHour),
+          Number(checkInMinute),
+          0,
+          0
+        )
+      ).toISOString();
+      const [checkOutHour, checkOutMinute] = checkOutTime.split(":");
+      const checkOutDateTime = new Date(
+        Date.UTC(
+          dateRange.to.getFullYear(),
+          dateRange.to.getMonth(),
+          dateRange.to.getDate(),
+          Number(checkOutHour),
+          Number(checkOutMinute),
+          0,
+          0
+        )
+      ).toISOString();
+      form.setValue("checkInDate", checkInDateTime);
+      form.setValue("checkOutDate", checkOutDateTime);
+    } else {
+      form.setValue("checkInDate", "");
+      form.setValue("checkOutDate", "");
+    }
+  }, [dateRange, form.watch("checkInTime")]);
 
   return (
     <Card className="max-w-md w-full mt-8">
@@ -136,9 +190,16 @@ const ReservationForm = () => {
               name="checkInDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Check-in Date</FormLabel>
+                  <FormLabel>Check-in Date and Check-out Date</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <DayPicker
+                      mode="range"
+                      selected={dateRange}
+                      onSelect={(range) => {
+                        setDateRange(range);
+                      }}
+                      required
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -146,12 +207,12 @@ const ReservationForm = () => {
             />
             <FormField
               control={form.control}
-              name="checkOutDate"
+              name="checkInTime"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Check-out Date</FormLabel>
+                  <FormLabel>Check-in Time</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input type="time" {...field} className="w-[100px]" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -180,7 +241,7 @@ const ReservationForm = () => {
                       <Input
                         type="number"
                         min={1}
-                        max={20}
+                        max={maxOccupants}
                         {...field}
                         className="no-spinner text-center w-16"
                         onChange={(e) =>
@@ -198,7 +259,9 @@ const ReservationForm = () => {
                       size={"icon"}
                       className="px-2 py-1 border rounded bg-gray-100 hover:bg-gray-200"
                       onClick={() =>
-                        field.onChange(Math.min(20, (field.value || 1) + 1))
+                        field.onChange(
+                          Math.min(maxOccupants, (field.value || 1) + 1)
+                        )
                       }
                       aria-label="Increase guests"
                     >

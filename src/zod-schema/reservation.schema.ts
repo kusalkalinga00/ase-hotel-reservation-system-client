@@ -4,12 +4,23 @@ export const ReservationSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits long"),
-  checkInDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: "Invalid date format",
-  }),
-  checkOutDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: "Invalid date format",
-  }),
+  checkInTime: z.string().min(1, "Check-in time is required"),
+  checkInDate: z
+    .string()
+    .refine((date) => !isNaN(Date.parse(date)), {
+      message: "Invalid date format",
+    })
+    .refine((date) => !!date, {
+      message: "Check-in and check-out dates are required",
+    }),
+  checkOutDate: z
+    .string()
+    .refine((date) => !isNaN(Date.parse(date)), {
+      message: "Invalid date format",
+    })
+    .refine((date) => !!date, {
+      message: "Check-in and check-out dates are required",
+    }),
   occupants: z
     .number()
     .min(1, "At least one guest is required")

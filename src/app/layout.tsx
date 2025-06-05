@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import AuthProvider from "@/providers/auth-provider";
 import ReactQueryProvider from "@/providers/react-query-provider";
+import "react-day-picker/style.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
