@@ -7,6 +7,7 @@ import { Users, Wifi, Car, Coffee, Tv, Bath } from "lucide-react";
 import React from "react";
 import { RoomCardProps } from "@/types/home.types";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const RoomCard: React.FC<RoomCardProps> = (props) => {
   const router = useRouter();
@@ -67,10 +68,14 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
       //   onClick={() => onClick?.(id)}
     >
       <div className="relative">
-        <img
+        <Image
           src={image || ""}
           alt={name}
-          className="w-full h-48 object-cover"
+          className=" w-full h-[200px] "
+          width={0}
+          height={0}
+          objectFit="cover"
+          sizes="100vw"
         />
         <Badge className={`absolute top-3 left-3 ${getTypeColor(name)}`}>
           {name.replace("_", " ")}
