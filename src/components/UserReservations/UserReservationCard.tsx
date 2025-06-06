@@ -78,6 +78,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
       toast.success("Reservation updated successfully");
       setEditingReservation(null);
       queryClient.invalidateQueries({ queryKey: ["user-reservations"] });
+      setOpenEditDialog(false);
     },
     onError: (error: any) => {
       toast.error(
@@ -119,6 +120,14 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
       );
     },
   });
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  const formatUTC = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(
+      date.getUTCDate()
+    )} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())} UTC`;
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -162,22 +171,40 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
     const checkInDate = new Date(reservation.checkInDate);
     const checkOutDate = new Date(reservation.checkOutDate);
     setEditForm({
-      checkInDate: format(checkInDate, "yyyy-MM-dd"),
-      checkInTime: format(checkInDate, "HH:mm"),
-      checkOutDate: format(checkOutDate, "yyyy-MM-dd"),
-      checkOutTime: format(checkOutDate, "HH:mm"),
+      checkInDate: `${checkInDate.getUTCFullYear()}-${pad(
+        checkInDate.getUTCMonth() + 1
+      )}-${pad(checkInDate.getUTCDate())}`,
+      checkInTime: `${pad(checkInDate.getUTCHours())}:${pad(
+        checkInDate.getUTCMinutes()
+      )}`,
+      checkOutDate: `${checkOutDate.getUTCFullYear()}-${pad(
+        checkOutDate.getUTCMonth() + 1
+      )}-${pad(checkOutDate.getUTCDate())}`,
+      checkOutTime: `${pad(checkOutDate.getUTCHours())}:${pad(
+        checkOutDate.getUTCMinutes()
+      )}`,
     });
   };
 
   const handleSaveEdit = async () => {
     if (!editingReservation) return;
-    // Construct date in local time (no 'Z' at the end)
+    // Parse form fields as UTC and construct ISO string in UTC
+    const [ciYear, ciMonth, ciDay] = editForm.checkInDate
+      .split("-")
+      .map(Number);
+    const [ciHour, ciMinute] = editForm.checkInTime.split(":").map(Number);
     const updatedCheckInDate = new Date(
-      `${editForm.checkInDate}T${editForm.checkInTime}:00`
+      Date.UTC(ciYear, ciMonth - 1, ciDay, ciHour, ciMinute)
     ).toISOString();
+
+    const [coYear, coMonth, coDay] = editForm.checkOutDate
+      .split("-")
+      .map(Number);
+    const [coHour, coMinute] = editForm.checkOutTime.split(":").map(Number);
     const updatedCheckOutDate = new Date(
-      `${editForm.checkOutDate}T${editForm.checkOutTime}:00`
+      Date.UTC(coYear, coMonth - 1, coDay, coHour, coMinute)
     ).toISOString();
+
     editMutation.mutate({
       id: editingReservation.id,
       checkInDate: updatedCheckInDate,
@@ -224,7 +251,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
               <div>
                 <p className="font-medium">Check-in</p>
                 <p className="text-sm text-muted-foreground">
-                  {format(new Date(reservation.checkInDate), "PPP 'at' p")}
+                  {formatUTC(reservation.checkInDate)}
                 </p>
               </div>
             </div>
@@ -234,7 +261,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
               <div>
                 <p className="font-medium">Check-out</p>
                 <p className="text-sm text-muted-foreground">
-                  {format(new Date(reservation.checkOutDate), "PPP 'at' p")}
+                  {formatUTC(reservation.checkOutDate)}
                 </p>
               </div>
             </div>
@@ -275,7 +302,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
                   size="sm"
                   onClick={() => handleEditClick(reservation)}
                 >
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4" />
                   Edit Booking
                 </Button>
               </DialogTrigger>
@@ -364,7 +391,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
                     Close
                   </Button>
                   <Button onClick={handleSaveEdit}>
-                    <Check className="h-4 w-4 mr-2" />
+                    <Check className="h-4 w-4 " />
                     Save Changes
                   </Button>
                 </DialogFooter>
@@ -376,7 +403,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" size="sm">
-                  <X className="h-4 w-4 mr-2" />
+                  <X className="h-4 w-4 " />
                   Cancel Booking
                 </Button>
               </AlertDialogTrigger>
