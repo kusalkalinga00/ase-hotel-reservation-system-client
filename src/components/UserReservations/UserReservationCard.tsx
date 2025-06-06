@@ -37,15 +37,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import useAxiosAuth from "@/hooks/useAxiosAuth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface UserReservationCardProps {
   reservation: Reservation;
@@ -60,6 +56,49 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
     checkInTime: "",
     checkOutDate: "",
     checkOutTime: "",
+  });
+
+  const axiosAuth = useAxiosAuth();
+  const queryClient = useQueryClient();
+
+  // PATCH mutation for editing reservation
+  const editMutation = useMutation({
+    mutationFn: async (payload: {
+      id: string;
+      checkInDate: string;
+      checkOutDate: string;
+    }) => {
+      return axiosAuth.patch(`/reservations/${payload.id}`, {
+        checkInDate: payload.checkInDate,
+        checkOutDate: payload.checkOutDate,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Reservation updated successfully");
+      setEditingReservation(null);
+      queryClient.invalidateQueries({ queryKey: ["user-reservations"] });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to update reservation"
+      );
+    },
+  });
+
+  // DELETE mutation for canceling reservation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return axiosAuth.delete(`/reservations/${id}`);
+    },
+    onSuccess: () => {
+      toast.success("Reservation cancelled successfully");
+      queryClient.invalidateQueries({ queryKey: ["user-reservations"] });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to cancel reservation"
+      );
+    },
   });
 
   const getStatusColor = (status: string) => {
@@ -103,17 +142,24 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
     });
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingReservation) return;
-
     const updatedCheckInDate = new Date(
       `${editForm.checkInDate}T${editForm.checkInTime}:00.000Z`
-    );
-
-    setEditingReservation(null);
+    ).toISOString();
+    const updatedCheckOutDate = new Date(
+      `${editForm.checkOutDate}T${editForm.checkOutTime}:00.000Z`
+    ).toISOString();
+    editMutation.mutate({
+      id: editingReservation.id,
+      checkInDate: updatedCheckInDate,
+      checkOutDate: updatedCheckOutDate,
+    });
   };
 
-  const handleCancelReservation = (reservationId: string) => {};
+  const handleCancelReservation = async (reservationId: string) => {
+    deleteMutation.mutate(reservationId);
+  };
 
   const formatCreditCard = (cardNumber: string) => {
     if (!cardNumber) return "No payment method";

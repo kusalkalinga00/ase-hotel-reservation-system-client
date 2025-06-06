@@ -7,25 +7,27 @@ export const useRefreshToken = () => {
 
   const refreshToken = async () => {
     if (!session?.refreshToken) {
-      console.error("No refresh token available");
-      signOut();
+      console.log("No refresh token available");
+      // signOut();
       return null;
     }
 
     try {
+      console.log("refeshPayload", {});
       const res = await axios.post(`/auth/refresh`, {
-        refresh_token: session.refreshToken,
+        userId: session.user.id,
+        refreshToken: session.refreshToken,
       });
 
       console.log("Refresh token success", res.data);
 
-      if (!res.data?.payload?.access_token) {
+      if (!res.data?.payload?.token) {
         throw new Error("Invalid response format");
       }
 
       const newTokens = {
-        accessToken: res.data.payload.access_token,
-        refreshToken: res.data.payload.refresh_token,
+        accessToken: res.data.payload.token,
+        refreshToken: res.data.payload.refreshToken,
       };
 
       // Update the session with the new tokens
