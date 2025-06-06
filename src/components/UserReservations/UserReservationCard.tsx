@@ -144,11 +144,12 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
 
   const handleSaveEdit = async () => {
     if (!editingReservation) return;
+    // Construct date in local time (no 'Z' at the end)
     const updatedCheckInDate = new Date(
-      `${editForm.checkInDate}T${editForm.checkInTime}:00.000Z`
+      `${editForm.checkInDate}T${editForm.checkInTime}:00`
     ).toISOString();
     const updatedCheckOutDate = new Date(
-      `${editForm.checkOutDate}T${editForm.checkOutTime}:00.000Z`
+      `${editForm.checkOutDate}T${editForm.checkOutTime}:00`
     ).toISOString();
     editMutation.mutate({
       id: editingReservation.id,
