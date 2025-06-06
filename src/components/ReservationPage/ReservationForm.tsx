@@ -92,7 +92,7 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
     onSuccess: (data: ApiResponse<ReservationResponsePayload>) => {
       toast.success(`${data.message}`);
       console.log("Reservation created:", data);
-      // router.push("/reservations");
+      router.push("/reservations");
     },
     onError: (error: AxiosError<ApiResponse<null>>) => {
       console.error("Error updating team", error);
