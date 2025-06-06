@@ -36,9 +36,13 @@ const UserReservationHistory = () => {
         <div className="space-y-6">
           {isLoading ? (
             <></>
+          ) : !initialReservationsResponse?.payload?.length ? (
+            <div className="text-center text-muted-foreground py-12">
+              You have no reservations.
+            </div>
           ) : (
             <>
-              {initialReservationsResponse?.payload.map((reservation) => (
+              {initialReservationsResponse.payload.map((reservation) => (
                 <UserReservationCard
                   reservation={reservation}
                   key={reservation.id}

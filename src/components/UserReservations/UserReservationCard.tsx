@@ -57,6 +57,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
     checkOutDate: "",
     checkOutTime: "",
   });
+  const [openEditDialog, setOpenEditDialog] = useState(false);
 
   const axiosAuth = useAxiosAuth();
   const queryClient = useQueryClient();
@@ -85,10 +86,12 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
     },
   });
 
-  // DELETE mutation for canceling reservation
-  const deleteMutation = useMutation({
+  // CANCELLED mutation for canceling reservation
+  const cancelMutation = useMutation({
     mutationFn: async (id: string) => {
-      return axiosAuth.delete(`/reservations/${id}`);
+      return axiosAuth.patch(`/reservations/${id}`, {
+        status: "CANCELLED",
+      });
     },
     onSuccess: () => {
       toast.success("Reservation cancelled successfully");
@@ -97,6 +100,22 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
     onError: (error: any) => {
       toast.error(
         error?.response?.data?.message || "Failed to cancel reservation"
+      );
+    },
+  });
+
+  // DELETE mutation for deleting reservation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return axiosAuth.delete(`/reservations/${id}`);
+    },
+    onSuccess: () => {
+      toast.success("Reservation deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["user-reservations"] });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to delete reservation"
       );
     },
   });
@@ -130,6 +149,14 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
     );
   };
 
+  const canDelete = (reservation: Reservation) => {
+    return (
+      reservation.status === "CANCELLED" ||
+      reservation.status === "CHECKED_OUT" ||
+      reservation.status === "NO_SHOW"
+    );
+  };
+
   const handleEditClick = (reservation: Reservation) => {
     setEditingReservation(reservation);
     const checkInDate = new Date(reservation.checkInDate);
@@ -159,6 +186,10 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
   };
 
   const handleCancelReservation = async (reservationId: string) => {
+    cancelMutation.mutate(reservationId);
+  };
+
+  const handleDeleteReservation = async (reservationId: string) => {
     deleteMutation.mutate(reservationId);
   };
 
@@ -237,7 +268,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-end">
           {canEdit(reservation) && (
-            <Dialog>
+            <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
@@ -252,7 +283,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
                 <DialogHeader>
                   <DialogTitle>Edit Reservation</DialogTitle>
                   <DialogDescription>
-                    Update your check-in/check-out details and number of guests.
+                    Update your check-in/check-out details
                   </DialogDescription>
                 </DialogHeader>
 
@@ -325,9 +356,12 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
                 <DialogFooter>
                   <Button
                     variant="outline"
-                    onClick={() => setEditingReservation(null)}
+                    onClick={() => {
+                      setEditingReservation(null);
+                      setOpenEditDialog(false);
+                    }}
                   >
-                    Cancel
+                    Close
                   </Button>
                   <Button onClick={handleSaveEdit}>
                     <Check className="h-4 w-4 mr-2" />
@@ -369,6 +403,18 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+          )}
+
+          {canDelete(reservation) && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleDeleteReservation(reservation.id)}
+              disabled={deleteMutation.isPending}
+            >
+              <X className="h-4 w-4 " />
+              Delete
+            </Button>
           )}
         </div>
       </CardContent>

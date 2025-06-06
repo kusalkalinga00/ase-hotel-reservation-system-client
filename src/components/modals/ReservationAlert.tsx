@@ -23,8 +23,9 @@ const ReservationAlert: React.FC<ReservationAlertProps> = (props) => {
         <AlertDialogHeader>
           <AlertDialogTitle>Notice</AlertDialogTitle>
           <AlertDialogDescription>
-            If user didn't enter credit card details by 7 pm, the reservation
-            will cancel.
+            Please note that the reservation will automatically cancel if do not
+            add credit card details before 7.00 PM on the same day of the
+            reservation.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
