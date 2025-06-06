@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogIn, User, Settings, LogOut, Menu } from "lucide-react";
+import { LogIn, User, Settings, LogOut, Menu, BookMarked } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -22,6 +22,10 @@ const CommonHeader = () => {
 
   const handleLogout = () => {
     signOut();
+  };
+
+  const handleReservations = () => {
+    router.push("/reservations");
   };
 
   return (
@@ -114,9 +118,9 @@ const CommonHeader = () => {
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                <DropdownMenuItem onClick={handleReservations}>
+                  <BookMarked className="mr-2 h-4 w-4" />
+                  <span>Reservations</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
