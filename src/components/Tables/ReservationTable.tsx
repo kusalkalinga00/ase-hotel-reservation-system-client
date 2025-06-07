@@ -63,14 +63,34 @@ export const columns: ColumnDef<ClerkReservation>[] = [
   {
     header: "Check-In Date",
     accessorKey: "checkInDate",
-    cell: ({ row }) =>
-      new Date(row.original.checkInDate).toLocaleDateString("en-GB"),
+    cell: ({ row }) => {
+      const date = new Date(row.original.checkInDate);
+      // Show UTC date and time as in API
+      return `${date.getUTCDate().toString().padStart(2, "0")}/${(
+        date.getUTCMonth() + 1
+      )
+        .toString()
+        .padStart(2, "0")}/${date.getUTCFullYear()}, ${date
+        .getUTCHours()
+        .toString()
+        .padStart(2, "0")}:${date.getUTCMinutes().toString().padStart(2, "0")}`;
+    },
   },
   {
     header: "Check-Out Date",
     accessorKey: "checkOutDate",
-    cell: ({ row }) =>
-      new Date(row.original.checkOutDate).toLocaleDateString("en-GB"),
+    cell: ({ row }) => {
+      const date = new Date(row.original.checkOutDate);
+      // Show UTC date and time as in API
+      return `${date.getUTCDate().toString().padStart(2, "0")}/${(
+        date.getUTCMonth() + 1
+      )
+        .toString()
+        .padStart(2, "0")}/${date.getUTCFullYear()}, ${date
+        .getUTCHours()
+        .toString()
+        .padStart(2, "0")}:${date.getUTCMinutes().toString().padStart(2, "0")}`;
+    },
   },
   {
     header: "Status",
@@ -81,7 +101,10 @@ export const columns: ColumnDef<ClerkReservation>[] = [
     header: "Manage",
     id: "manage",
     cell: ({ row }) => (
-      <ReservationManageModal reservationId={row.original.id} />
+      <ReservationManageModal
+        reservationId={row.original.id}
+        checkOutDate={row.original.checkOutDate}
+      />
     ),
   },
 ];
