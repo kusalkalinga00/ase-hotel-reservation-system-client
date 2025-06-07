@@ -16,7 +16,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 
-const CommonHeader = () => {
+const DashBoardHeader = () => {
   const router = useRouter();
   const session = useSession();
 
@@ -45,28 +45,6 @@ const CommonHeader = () => {
           </Link>
         </div>
 
-        {/* Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link
-            href="/"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Home
-          </Link>
-          <Link
-            href="/about"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            About
-          </Link>
-          <Link
-            href="/contact"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            Contact
-          </Link>
-        </nav>
-
         {/* Auth Section */}
         <div className="flex items-center space-x-4">
           {!session.data ? (
@@ -85,21 +63,6 @@ const CommonHeader = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
-              {session.data.user.role === "CLERK" ||
-              session.data.user.role === "MANAGER" ? (
-                <div>
-                  <Button
-                    variant={"outline"}
-                    size="sm"
-                    onClick={() => router.push("/dashboard/reservations")}
-                  >
-                    Admin Dashboard
-                  </Button>
-                </div>
-              ) : (
-                <></>
-              )}
-
               {/* User Dropdown Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -159,4 +122,4 @@ const CommonHeader = () => {
   );
 };
 
-export default CommonHeader;
+export default DashBoardHeader;

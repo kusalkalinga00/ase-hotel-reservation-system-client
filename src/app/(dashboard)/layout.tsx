@@ -1,3 +1,5 @@
+
+import DashBoardHeader from "@/components/dashboard/Header";
 import { AppSidebar } from "@/components/dashboard/sidebar/AppSidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -9,8 +11,12 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarTrigger />
-      {children}
+      <main className="w-full">
+        <div className="">
+          <DashBoardHeader />
+        </div>
+        {children}
+      </main>
     </SidebarProvider>
   );
 }
