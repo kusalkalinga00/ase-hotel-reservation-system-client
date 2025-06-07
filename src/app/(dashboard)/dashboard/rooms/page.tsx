@@ -1,7 +1,7 @@
-import React from "react";
+import RoomManageView from "@/views/RoomManageView";
 
 function RoomsPage() {
-  return <div>RoomsPage</div>;
+  return <RoomManageView />;
 }
 
 export default RoomsPage;

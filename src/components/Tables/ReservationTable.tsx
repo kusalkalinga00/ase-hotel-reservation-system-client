@@ -20,11 +20,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useRouter } from "next/navigation";
+
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { ClerkReservation } from "@/types/api.types";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,

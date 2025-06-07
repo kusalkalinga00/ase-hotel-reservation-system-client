@@ -24,7 +24,9 @@ const ReservationsView = () => {
 
   return (
     <div className="pt-10 px-5 w-full">
-      <ReservationTable data={initialReservationsResponse?.payload || []} />
+      {initialReservationsResponse?.payload && (
+        <ReservationTable data={initialReservationsResponse?.payload || []} />
+      )}
     </div>
   );
 };

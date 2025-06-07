@@ -26,11 +26,11 @@ const DashboardSidebarGroup = () => {
   const pathName = usePathname();
   const session = useSession();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // useEffect(() => {
+  //   setMounted(true);
+  // }, []);
 
-  if (!mounted) return null;
+  // if (!mounted) return null;
 
   return (
     <SidebarGroup>
