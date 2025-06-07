@@ -14,14 +14,23 @@ import {
   Settings,
   Earth,
   Shapes,
+  Car,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const DashboardSidebarGroup = () => {
+  const [mounted, setMounted] = useState(false);
   const pathName = usePathname();
   const session = useSession();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <SidebarGroup>
@@ -63,6 +72,19 @@ const DashboardSidebarGroup = () => {
             <Link href={"/dashboard/earnings"}>
               <Shapes size={20} />
               Earnings
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            tooltip={"Travel Companies"}
+            className="flex items-center"
+            asChild
+            isActive={pathName === "/dashboard/travel-company"}
+          >
+            <Link href={"/dashboard/travel-company"}>
+              <Car size={20} />
+              Travel Companies
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
