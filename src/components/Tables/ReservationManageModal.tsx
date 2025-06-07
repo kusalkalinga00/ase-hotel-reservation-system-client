@@ -10,48 +10,69 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-const RESERVATION_STATUSES = [
-  "PENDING",
-  "CONFIRMED",
-  "CANCELLED",
-  "CHECKED_IN",
-  "CHECKED_OUT",
-  "NO_SHOW",
-];
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useAxiosAuth from "@/hooks/useAxiosAuth";
+import { AxiosError } from "axios";
+import { ApiResponse } from "@/types/api.types";
+import { toast } from "sonner";
 
 const ReservationManageModal = ({
-  currentStatus,
   reservationId,
 }: {
-  currentStatus: string;
   reservationId: string;
 }) => {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const axiosAuth = useAxiosAuth();
 
-  const onStatusChange = (newStatus: string) => {
-    console.log(
-      `Changing status of reservation ${reservationId} to ${newStatus}`
-    );
-  };
+  // PATCH /{id}/checkin mutation
+  const checkInMutation = useMutation({
+    mutationFn: async () => {
+      await axiosAuth.patch(`/reservations/${reservationId}/checkin`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clerk-reservations"] });
+      toast.success("Reservation checked in successfully");
+    },
 
-  const handleSave = () => {
-    // Handle save logic here, e.g., API call to save changes
-    console.log(`Saving changes for reservation ${reservationId}`);
-    setOpen(false);
-  };
+    onError: (error: AxiosError<ApiResponse<null>>) => {
+      console.log("error checkInMutation", error);
+      toast.error(error.response?.data.message || "An error occurred");
+    },
+  });
+
+  // PATCH /{id}/checkout mutation
+  const checkOutMutation = useMutation({
+    mutationFn: async () => {
+      await axiosAuth.patch(`/reservations/${reservationId}/checkout`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clerk-reservations"] });
+      toast.success("Reservation checked out successfully");
+    },
+    onError: (error: AxiosError<ApiResponse<null>>) => {
+      console.log("error checkOutMutation", error);
+      toast.error(error.response?.data.message || "An error occurred");
+    },
+  });
+
+  // DELETE /{id} mutation
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await axiosAuth.delete(`/reservations/${reservationId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clerk-reservations"] });
+      toast.success("Reservation deleted successfully");
+      setOpen(false);
+    },
+    onError: (error: AxiosError<ApiResponse<null>>) => {
+      console.log("error deleteMutation", error);
+      toast.error(error.response?.data.message || "An error occurred");
+    },
+  });
 
   const handleClose = () => {
-    // Handle close logic here, e.g., reset any unsaved changes
-    console.log(`Closing modal for reservation ${reservationId}`);
     setOpen(false);
   };
 
@@ -66,20 +87,43 @@ const ReservationManageModal = ({
         <DialogHeader>
           <DialogTitle>Manage Reservation</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-4">
-          <Label htmlFor="status-select">Change Status:</Label>
-          <Select value={currentStatus} onValueChange={onStatusChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              {RESERVATION_STATUSES.map((status) => (
-                <SelectItem key={status} value={status}>
-                  {status}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex flex-col space-y-4">
+          <div className="space-y-2">
+            <div className="text-sm">Delete Reservation</div>
+            <div>
+              <Button
+                variant={"destructive"}
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-sm">Check-In Reservation</div>
+            <div>
+              <Button
+                variant={"default"}
+                onClick={() => checkInMutation.mutate()}
+                disabled={checkInMutation.isPending}
+              >
+                {checkInMutation.isPending ? "Checking In..." : "Check-In"}
+              </Button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-sm">Check-Out Reservation</div>
+            <div>
+              <Button
+                variant={"outline"}
+                onClick={() => checkOutMutation.mutate()}
+                disabled={checkOutMutation.isPending}
+              >
+                {checkOutMutation.isPending ? "Checking Out..." : "Check-Out"}
+              </Button>
+            </div>
+          </div>
         </div>
         <DialogFooter>
           <DialogClose asChild>
@@ -87,7 +131,6 @@ const ReservationManageModal = ({
               Close
             </Button>
           </DialogClose>
-          <Button onClick={handleSave}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

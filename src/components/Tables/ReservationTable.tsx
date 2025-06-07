@@ -81,10 +81,7 @@ export const columns: ColumnDef<ClerkReservation>[] = [
     header: "Manage",
     id: "manage",
     cell: ({ row }) => (
-      <ReservationManageModal
-        currentStatus="PENDING"
-        reservationId={row.original.id}
-      />
+      <ReservationManageModal reservationId={row.original.id} />
     ),
   },
 ];
