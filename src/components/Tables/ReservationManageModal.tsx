@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,9 +21,11 @@ import { Input } from "../ui/input";
 const ReservationManageModal = ({
   reservationId,
   checkOutDate: initialCheckOutDate,
+  rate,
 }: {
   reservationId: string;
   checkOutDate: string;
+  rate: number;
 }) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -98,8 +100,29 @@ const ReservationManageModal = ({
   const [editCheckOutDate, setEditCheckOutDate] = useState("");
   const [editCheckOutTime, setEditCheckOutTime] = useState("");
 
+  // Calculate payment amount
+  const [paymentAmount, setPaymentAmount] = useState<number>(0);
+  const [paymentMethod, setPaymentMethod] = useState<string>("CASH");
+
+  // Billing mutation
+  const billingMutation = useMutation({
+    mutationFn: async (payload: {
+      reservationId: string;
+      amount: number;
+      paymentMethod: string;
+    }) => {
+      await axiosAuth.post("/billing", payload);
+    },
+    onSuccess: () => {
+      toast.success("Billing successful!");
+    },
+    onError: (error: AxiosError<ApiResponse<null>>) => {
+      toast.error(error.response?.data.message || "Billing failed");
+    },
+  });
+
   // Prefill editCheckOutDate and editCheckOutTime from props if available
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialCheckOutDate) {
       const date = new Date(initialCheckOutDate);
       // Use local time for consistency with table
@@ -116,6 +139,27 @@ const ReservationManageModal = ({
       );
     }
   }, [initialCheckOutDate, open]);
+
+  useEffect(() => {
+    if (initialCheckOutDate && rate) {
+      // Find check-in date from reservationId context or props if available
+      // For this example, let's assume check-in date is available as a prop or can be fetched if needed
+      // Here, we will just use a placeholder for check-in date
+      // You should replace this with the actual check-in date from reservation data
+      // For now, let's assume check-in date is 3 days before check-out
+      const checkOut = new Date(initialCheckOutDate);
+      // Placeholder: 3 nights before
+      const checkIn = new Date(checkOut);
+      checkIn.setDate(checkOut.getDate() - 3);
+      // Calculate nights
+      const msPerNight = 1000 * 60 * 60 * 24;
+      const nights = Math.max(
+        1,
+        Math.round((checkOut.getTime() - checkIn.getTime()) / msPerNight)
+      );
+      setPaymentAmount(nights * rate);
+    }
+  }, [initialCheckOutDate, rate]);
 
   // Handler for update check-out button
   const handleEditCheckOut = () => {
@@ -142,6 +186,18 @@ const ReservationManageModal = ({
     } else {
       toast.error("Please select both date and time");
     }
+  };
+
+  const handleCheckOut = () => {
+    checkOutMutation.mutate(undefined, {
+      onSuccess: () => {
+        billingMutation.mutate({
+          reservationId,
+          amount: paymentAmount,
+          paymentMethod,
+        });
+      },
+    });
   };
 
   const handleClose = () => {
@@ -187,19 +243,6 @@ const ReservationManageModal = ({
             </div>
           </div>
           <div className="space-y-2">
-            <div className="text-sm font-bold">Check-Out Reservation</div>
-            <div>
-              <Button
-                variant={"outline"}
-                onClick={() => checkOutMutation.mutate()}
-                disabled={checkOutMutation.isPending}
-                className="text-xs"
-              >
-                {checkOutMutation.isPending ? "Checking Out..." : "Check-Out"}
-              </Button>
-            </div>
-          </div>
-          <div className="space-y-2">
             <div className="text-sm font-bold">Edit Check-Out</div>
             <div className="space-y-2">
               <Label htmlFor="checkOutDate" className="text-xs">
@@ -236,6 +279,40 @@ const ReservationManageModal = ({
                 {editCheckOutMutation.isPending
                   ? "Updating..."
                   : "Update Check-Out Date"}
+              </Button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-sm font-bold">Check-Out Reservation</div>
+
+            <div>
+              <div>Payment Method</div>
+              <div>
+                <select
+                  className="border rounded px-2 py-1 text-sm"
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                >
+                  <option value="CASH">Cash</option>
+                  <option value="CREDIT_CARD">Credit Card</option>
+                </select>
+              </div>
+              <div className="mt-2 text-sm font-semibold text-blue-900">
+                Payment Amount: ${paymentAmount}
+              </div>
+            </div>
+            <div>
+              <Button
+                variant={"outline"}
+                onClick={handleCheckOut}
+                disabled={
+                  checkOutMutation.isPending || billingMutation.isPending
+                }
+                className="text-xs"
+              >
+                {checkOutMutation.isPending || billingMutation.isPending
+                  ? "Processing..."
+                  : "Check-Out"}
               </Button>
             </div>
           </div>

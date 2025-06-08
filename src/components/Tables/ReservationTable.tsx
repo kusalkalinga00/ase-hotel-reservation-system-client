@@ -103,6 +103,7 @@ export const columns: ColumnDef<ClerkReservation>[] = [
       <ReservationManageModal
         reservationId={row.original.id}
         checkOutDate={row.original.checkOutDate}
+        rate={row.original.room.roomRate || 0}
       />
     ),
   },

@@ -32,6 +32,7 @@ export interface Room {
   number: string;
   roomCategoryId: string;
   status: string;
+  roomRate?: number;
 }
 
 export interface Customer {

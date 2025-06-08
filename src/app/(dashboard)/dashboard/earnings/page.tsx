@@ -1,7 +1,8 @@
+import EarningsView from "@/views/EarningsView";
 import React from "react";
 
 function EarningsPage() {
-  return <div>page</div>;
+  return <EarningsView />;
 }
 
 export default EarningsPage;
