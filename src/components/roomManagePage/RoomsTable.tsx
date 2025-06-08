@@ -22,10 +22,10 @@ import {
 } from "@/components/ui/table";
 import { Room } from "@/types/api.types";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
-import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
+import DeletRoom from "@/components/roomManagePage/DeletRoom";
 
 interface RoomCategory {
   id: string;
@@ -64,18 +64,7 @@ export const columns: ColumnDef<Room>[] = [
     accessorKey: "id",
     cell: ({ row }: { row: any }) => {
       const roomId = row.original.id;
-      return (
-        <div className="flex justify-center">
-          <Button
-            variant="destructive"
-            onClick={() => {
-              console.log(`Manage room with ID: ${roomId}`);
-            }}
-          >
-            Delete
-          </Button>
-        </div>
-      );
+      return <DeletRoom roomId={roomId} />;
     },
   },
 ];
@@ -87,7 +76,7 @@ interface RoomsTableProps {
 const RoomsTable = ({ rooms }: RoomsTableProps) => {
   const [roomCategories, setRoomCategories] = useState<RoomCategory[]>([]);
   const axiosAuth = useAxiosAuth();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     axiosAuth.get("/room-categories").then((res) => {
@@ -95,44 +84,9 @@ const RoomsTable = ({ rooms }: RoomsTableProps) => {
     });
   }, [axiosAuth]);
 
-  const handleDelete = async (roomId: string) => {
-    setDeletingId(roomId);
-    try {
-      await axiosAuth.delete(`/room-categories/${roomId}`);
-      setRoomCategories((prev) => prev.filter((cat) => cat.id !== roomId));
-      // Optionally, you may want to refetch rooms or show a toast
-    } catch (err) {
-      // Optionally, show error toast
-      console.error(err);
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   const table = useReactTable({
     data: rooms,
-    columns: columns.map((col) => {
-      if (col.header === "Manage") {
-        return {
-          ...col,
-          cell: ({ row }: { row: any }) => {
-            const roomId = row.original.id;
-            return (
-              <div className="flex justify-center">
-                <Button
-                  variant="destructive"
-                  onClick={() => handleDelete(roomId)}
-                  disabled={deletingId === roomId}
-                >
-                  {deletingId === roomId ? "Deleting..." : "Delete"}
-                </Button>
-              </div>
-            );
-          },
-        };
-      }
-      return col;
-    }),
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     meta: { roomCategories },
