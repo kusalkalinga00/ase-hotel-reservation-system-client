@@ -56,7 +56,7 @@ const LoginForm = () => {
         toast.success("Login successful!");
         router.push(redirectUrl);
       } else {
-        toast.error(result?.error || "Invalid email or password");
+        toast.error("Invalid email or password");
       }
     } catch (err: any) {
       toast.error(err?.message || "Something went wrong");

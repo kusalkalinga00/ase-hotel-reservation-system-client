@@ -131,10 +131,10 @@ const CommonHeader = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  {/* <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuItem onClick={handleReservations}>
                     <BookMarked className="mr-2 h-4 w-4" />
                     <span>Reservations</span>
