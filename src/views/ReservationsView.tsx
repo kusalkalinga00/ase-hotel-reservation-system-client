@@ -1,4 +1,5 @@
 "use client";
+import ManualReservationForm from "@/components/ReservationPage/ManualReservationForm";
 import ReservationTable from "@/components/Tables/ReservationTable";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { ApiResponse, ClerkReservation } from "@/types/api.types";
@@ -26,10 +27,12 @@ const ReservationsView = () => {
   });
 
   return (
-    <div className="pt-10 px-5 w-full">
+    <div className="py-10 px-5 w-full">
       {initialReservationsResponse?.payload && (
         <ReservationTable data={initialReservationsResponse?.payload || []} />
       )}
+
+      <ManualReservationForm />
     </div>
   );
 };
