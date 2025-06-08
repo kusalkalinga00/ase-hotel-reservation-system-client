@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import {
   RegisterUserSchema,
@@ -33,6 +34,7 @@ const RegisterForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [isTravelAgent, setIsTravelAgent] = useState(false);
 
   const form = useForm<RegisterUserSchemaType>({
     resolver: zodResolver(RegisterUserSchema),
@@ -51,7 +53,7 @@ const RegisterForm = () => {
         data.name,
         data.email,
         data.password,
-        "CUSTOMER"
+        isTravelAgent ? "TRAVEL_COMPANY" : "CUSTOMER"
       );
       if (!response.success) {
         toast.error(response.message || "Registration failed");
@@ -157,7 +159,21 @@ const RegisterForm = () => {
                 )}
               />
             </div>
-
+            <div className="flex items-center gap-2 mt-4 mb-2">
+              <Checkbox
+                id="travel-agent"
+                checked={isTravelAgent}
+                onCheckedChange={(checked) =>
+                  setIsTravelAgent(checked === true)
+                }
+              />
+              <label
+                htmlFor="travel-agent"
+                className="text-sm select-none cursor-pointer"
+              >
+                If you are a Travel agent, then check
+              </label>
+            </div>
             <div className="flex-col flex gap-2 mt-5">
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Signing up..." : "Sign up"}

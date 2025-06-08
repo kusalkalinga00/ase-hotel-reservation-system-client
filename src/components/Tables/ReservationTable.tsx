@@ -125,8 +125,12 @@ const ReservationTable: React.FC<ReservationTableProps> = (props) => {
   const { data } = props;
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
+  const filteredData = data.filter(
+    (reservation) => reservation.customer?.role !== "TRAVEL_COMPANY"
+  );
+
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),

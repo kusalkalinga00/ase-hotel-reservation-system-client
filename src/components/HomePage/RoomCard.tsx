@@ -118,12 +118,12 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
       </CardContent>
 
       <CardFooter className="p-4 pt-0 flex items-center justify-between">
-        <div className="text-right">
+        <div className="text-left">
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
             ${price}
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            per night
+            {name === "RESIDENTIAL_SUITE" ? "Weekly Rate" : "Per Night"}
           </div>
         </div>
         <Button className="ml-4 cursor-pointer" onClick={handleSeeMore}>
