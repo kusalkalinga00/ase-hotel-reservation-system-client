@@ -5,6 +5,7 @@ import React from "react";
 import { Room } from "@/types/api.types";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { useQuery } from "@tanstack/react-query";
+import AddRoomModal from "@/components/roomManagePage/AddRoomModal";
 
 const RoomManageView = () => {
   const axiosAuth = useAxiosAuth();
@@ -23,9 +24,9 @@ const RoomManageView = () => {
   return (
     <div className="min-h-screen px-5 pt-5 flex flex-col">
       <div className="flex justify-start">
-        <Button>Add Room</Button>
+        <AddRoomModal />
       </div>
-      <div className="w-full mt-2">
+      <div className="w-full mt-5">
         {isLoading ? (
           <div>Loading...</div>
         ) : isError || !roomsResponse?.payload ? (
