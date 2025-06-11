@@ -35,6 +35,9 @@ const ManualReservationForm: React.FC<ManualReservationFormProps> = ({
 }) => {
   const axiosAuth = useAxiosAuth();
   const [loading, setLoading] = useState(false);
+
+
+  
   const {
     register,
     handleSubmit,

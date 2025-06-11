@@ -63,7 +63,7 @@ const CreditCardForm = forwardRef<
               <FormControl>
                 <Input
                   type="text"
-                  placeholder="1234 5678 9012 3456"
+                  placeholder="3782 8224 6310 005"
                   {...field}
                   className="input"
                 />

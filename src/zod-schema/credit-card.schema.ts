@@ -1,10 +1,10 @@
 import { z } from "zod";
+import valid from "card-validator";
 
 export const CreditCardSchema = z.object({
-  creditCardNumber: z
-    .string()
-    .length(16, "Credit card number must be 16 digits long")
-    .regex(/^\d+$/, "Credit card number must contain only digits"),
+  creditCardNumber: z.string().refine((val) => valid.number(val).isValid, {
+    message: "Invalid credit card number",
+  }),
   creditCardExpiry: z
     .string()
     .regex(
