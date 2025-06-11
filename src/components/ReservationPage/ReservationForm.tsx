@@ -107,42 +107,42 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
     const reservationValid = await form.trigger();
     if (!reservationValid) return;
     const reservationData = form.getValues();
-    console.log("Reservation Data:", reservationData);
-    // if (addCard) {
-    //   if (creditCardFormRef.current) {
-    //     const creditCardData = await creditCardFormRef.current.submit();
-    //     if (!creditCardData) return; // Credit card form invalid
-    //     console.log("reserved with credit card", {
-    //       ...reservationData,
-    //       ...creditCardData,
-    //     });
-    //     handleReservationMutation.mutate({
-    //       roomType,
-    //       checkInDate: reservationData.checkInDate,
-    //       checkOutDate: reservationData.checkOutDate,
-    //       occupants: reservationData.occupants,
-    //       creditCard: creditCardData.creditCardNumber,
-    //       creditCardExpiry: creditCardData.creditCardExpiry,
-    //       creditCardCVV: creditCardData.creditCardCVV,
-    //     });
-    //   }
-    // } else {
-    //   console.log("reserved without credit card", {
-    //     ...reservationData,
-    //     creditCardNumber: "",
-    //     creditCardExpiry: "",
-    //     creditCardCVV: "",
-    //   });
-    //   handleReservationMutation.mutate({
-    //     roomType,
-    //     checkInDate: reservationData.checkInDate,
-    //     checkOutDate: reservationData.checkOutDate,
-    //     occupants: reservationData.occupants,
-    //     creditCard: "",
-    //     creditCardExpiry: "",
-    //     creditCardCVV: "",
-    //   });
-    // }
+
+    if (addCard) {
+      if (creditCardFormRef.current) {
+        const creditCardData = await creditCardFormRef.current.submit();
+        if (!creditCardData) return; // Credit card form invalid
+        console.log("reserved with credit card", {
+          ...reservationData,
+          ...creditCardData,
+        });
+        handleReservationMutation.mutate({
+          roomType,
+          checkInDate: reservationData.checkInDate,
+          checkOutDate: reservationData.checkOutDate,
+          occupants: reservationData.occupants,
+          creditCard: creditCardData.creditCardNumber,
+          creditCardExpiry: creditCardData.creditCardExpiry,
+          creditCardCVV: creditCardData.creditCardCVV,
+        });
+      }
+    } else {
+      console.log("reserved without credit card", {
+        ...reservationData,
+        creditCardNumber: "",
+        creditCardExpiry: "",
+        creditCardCVV: "",
+      });
+      handleReservationMutation.mutate({
+        roomType,
+        checkInDate: reservationData.checkInDate,
+        checkOutDate: reservationData.checkOutDate,
+        occupants: reservationData.occupants,
+        creditCard: "",
+        creditCardExpiry: "",
+        creditCardCVV: "",
+      });
+    }
   };
 
   useEffect(() => {
@@ -247,9 +247,6 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
                   <FormControl>
                     <DayPicker
                       mode="range"
-                      // hidden={{
-                      //   from: before(today),
-                      // }}
                       disabled={{ before: today }}
                       selected={dateRange}
                       onSelect={(range) => {

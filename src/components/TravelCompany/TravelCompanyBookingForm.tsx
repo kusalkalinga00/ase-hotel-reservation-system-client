@@ -44,6 +44,7 @@ const ROOM_TYPES = [
 
 const TravelCompanyBookingForm = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const today = new Date();
 
   const form = useForm({
     defaultValues: {
@@ -174,6 +175,7 @@ const TravelCompanyBookingForm = () => {
                       selected={dateRange}
                       onSelect={setDateRange}
                       required
+                      disabled={{ before: today }}
                     />
                   </FormControl>
                   <FormMessage />
