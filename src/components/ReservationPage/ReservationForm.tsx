@@ -37,6 +37,7 @@ import { useMutation } from "@tanstack/react-query";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { AxiosError } from "axios";
 import { ApiResponse, ReservationResponsePayload } from "@/types/api.types";
+import { before } from "node:test";
 
 interface ReservationFormProps {
   maxOccupants: number;
@@ -63,6 +64,8 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
   const axiosAuth = useAxiosAuth();
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  const today = new Date();
 
   const form = useForm<ReservationSchemaType>({
     resolver: (data, context, options) =>
@@ -104,41 +107,42 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
     const reservationValid = await form.trigger();
     if (!reservationValid) return;
     const reservationData = form.getValues();
-    if (addCard) {
-      if (creditCardFormRef.current) {
-        const creditCardData = await creditCardFormRef.current.submit();
-        if (!creditCardData) return; // Credit card form invalid
-        console.log("reserved with credit card", {
-          ...reservationData,
-          ...creditCardData,
-        });
-        handleReservationMutation.mutate({
-          roomType,
-          checkInDate: reservationData.checkInDate,
-          checkOutDate: reservationData.checkOutDate,
-          occupants: reservationData.occupants,
-          creditCard: creditCardData.creditCardNumber,
-          creditCardExpiry: creditCardData.creditCardExpiry,
-          creditCardCVV: creditCardData.creditCardCVV,
-        });
-      }
-    } else {
-      console.log("reserved without credit card", {
-        ...reservationData,
-        creditCardNumber: "",
-        creditCardExpiry: "",
-        creditCardCVV: "",
-      });
-      handleReservationMutation.mutate({
-        roomType,
-        checkInDate: reservationData.checkInDate,
-        checkOutDate: reservationData.checkOutDate,
-        occupants: reservationData.occupants,
-        creditCard: "",
-        creditCardExpiry: "",
-        creditCardCVV: "",
-      });
-    }
+    console.log("Reservation Data:", reservationData);
+    // if (addCard) {
+    //   if (creditCardFormRef.current) {
+    //     const creditCardData = await creditCardFormRef.current.submit();
+    //     if (!creditCardData) return; // Credit card form invalid
+    //     console.log("reserved with credit card", {
+    //       ...reservationData,
+    //       ...creditCardData,
+    //     });
+    //     handleReservationMutation.mutate({
+    //       roomType,
+    //       checkInDate: reservationData.checkInDate,
+    //       checkOutDate: reservationData.checkOutDate,
+    //       occupants: reservationData.occupants,
+    //       creditCard: creditCardData.creditCardNumber,
+    //       creditCardExpiry: creditCardData.creditCardExpiry,
+    //       creditCardCVV: creditCardData.creditCardCVV,
+    //     });
+    //   }
+    // } else {
+    //   console.log("reserved without credit card", {
+    //     ...reservationData,
+    //     creditCardNumber: "",
+    //     creditCardExpiry: "",
+    //     creditCardCVV: "",
+    //   });
+    //   handleReservationMutation.mutate({
+    //     roomType,
+    //     checkInDate: reservationData.checkInDate,
+    //     checkOutDate: reservationData.checkOutDate,
+    //     occupants: reservationData.occupants,
+    //     creditCard: "",
+    //     creditCardExpiry: "",
+    //     creditCardCVV: "",
+    //   });
+    // }
   };
 
   useEffect(() => {
@@ -243,6 +247,10 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
                   <FormControl>
                     <DayPicker
                       mode="range"
+                      // hidden={{
+                      //   from: before(today),
+                      // }}
+                      disabled={{ before: today }}
                       selected={dateRange}
                       onSelect={(range) => {
                         setDateRange(range);
@@ -316,6 +324,11 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
                     >
                       <MoveUp className="" />
                     </Button>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">
+                      Max {maxOccupants} guests allowed.
+                    </p>
                   </div>
                   <FormMessage />
                 </FormItem>
