@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -35,6 +34,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { ApiResponse } from "@/types/api.types";
+import { RoomCategory } from "@/types/room-category.types";
 
 const addRoomSchema = z.object({
   number: z
@@ -47,7 +47,7 @@ type AddRoomSchemaType = z.infer<typeof addRoomSchema>;
 
 const AddRoomModal = () => {
   const [open, setOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<RoomCategory[]>([]);
   const axiosAuth = useAxiosAuth();
   const queryClient = useQueryClient();
 
@@ -138,7 +138,7 @@ const AddRoomModal = () => {
                         <SelectValue placeholder="Select room type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat: any) => (
+                        {categories.map((cat) => (
                           <SelectItem key={cat.id} value={cat.id}>
                             {cat.name}
                           </SelectItem>

@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { RoomCategory } from "@/types/room-category.types";
-import { useEffect } from "react";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { useQuery } from "@tanstack/react-query";
 import { ApiResponse } from "@/types/api.types";
@@ -89,7 +88,6 @@ const RoomView: React.FC<RoomViewProps> = (props) => {
   const {
     data: roomType,
     isLoading,
-    isFetched,
   } = useQuery<ApiResponse<RoomCategory>>({
     queryKey: ["roomCategory", roomCategoryId],
     queryFn: fetchAllRoomsCategory,

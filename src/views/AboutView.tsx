@@ -23,11 +23,11 @@ const AboutView = () => {
           </div>
 
           <p className="text-gray-700 leading-relaxed text-base">
-            Nestled along the golden shores of Mount Lavinia, Colombia's iconic
+            {`Nestled along the golden shores of Mount Lavinia, Colombia's iconic
             beachfront, Sahbay Lounge redefines coastal luxury. Founded in 2010,
             our hotel blends Sri Lanka's rich hospitality traditions with
             contemporary design, offering a serene escape just 12 km from
-            Colombo's bustling city center.
+            Colombo's bustling city center.`}
           </p>
         </section>
 
@@ -36,10 +36,10 @@ const AboutView = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Philosophy</h2>
 
           <p className="text-gray-700 leading-relaxed text-base">
-            We believe in "barefoot elegance" – where unparalleled beach views
+            {`We believe in "barefoot elegance" – where unparalleled beach views
             meet thoughtful comforts. Every detail celebrates Sri Lanka's
             natural beauty, from handwoven batik textiles to sustainably sourced
-            teak furnishings.
+            teak furnishings.`}
           </p>
         </section>
 

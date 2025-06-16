@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -58,8 +57,9 @@ const LoginForm = () => {
       } else {
         toast.error("Invalid email or password");
       }
-    } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+    } catch (err) {
+      console.log("Login error:", err);
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }

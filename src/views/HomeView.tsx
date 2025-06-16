@@ -1,6 +1,5 @@
 "use client";
 import RoomCard from "@/components/HomePage/RoomCard";
-import { roomsData } from "@/data";
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
@@ -25,11 +24,7 @@ const HomeView = () => {
     return response.data;
   };
 
-  const {
-    data: roomTypes,
-    isLoading,
-    isFetched,
-  } = useQuery<ApiResponse<RoomCategory[]>>({
+  const { data: roomTypes, isLoading } = useQuery<ApiResponse<RoomCategory[]>>({
     queryKey: ["roomCategories"],
     queryFn: fetchAllRoomsCategories,
     refetchOnWindowFocus: false,

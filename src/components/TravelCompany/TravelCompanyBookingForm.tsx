@@ -18,14 +18,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { DateRange, DayPicker } from "react-day-picker";
 import { MoveUp } from "lucide-react";
-import {
-  ReservationSchema,
-  ReservationSchemaType,
-} from "@/zod-schema/reservation.schema";
 import { Select } from "@/components/ui/select";
 import {
   SelectItem,
@@ -35,6 +30,8 @@ import {
 } from "@/components/ui/select";
 import { useMutation } from "@tanstack/react-query";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
+import { AxiosError } from "axios";
+import { ApiResponse } from "@/types/api.types";
 
 const ROOM_TYPES = [
   { label: "Standard", value: "STANDARD" },
@@ -75,7 +72,7 @@ const TravelCompanyBookingForm = () => {
       toast.success("Reservation successful!");
       form.reset();
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(error?.response?.data?.message || "Reservation failed");
     },
   });
@@ -111,6 +108,8 @@ const TravelCompanyBookingForm = () => {
       form.setValue("checkInDate", "");
       form.setValue("checkOutDate", "");
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange]);
 
   const onSubmit = (values: {

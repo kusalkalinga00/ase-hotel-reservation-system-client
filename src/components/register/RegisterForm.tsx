@@ -1,12 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -76,8 +70,9 @@ const RegisterForm = () => {
         );
         router.push("/login");
       }
-    } catch (err: any) {
-      toast.error(err?.message || "Something went wrong");
+    } catch (err) {
+      console.error("Registration error:", err);
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }

@@ -2,9 +2,6 @@
 import * as React from "react";
 import {
   ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -21,10 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TravelCompanyReservation } from "@/types/travel-company-reservation.types";
-import useAxiosAuth from "@/hooks/useAxiosAuth";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardHeader } from "@/components/ui/card";
-import { useEffect, useState } from "react";
 import ManageButtons from "./ManageButtons";
 
 export const columns: ColumnDef<TravelCompanyReservation>[] = [

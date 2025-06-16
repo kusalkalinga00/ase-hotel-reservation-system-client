@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { Reservation } from "@/types/auth-payload.types";
 import UserReservationCard from "@/components/UserReservations/UserReservationCard";
 import { useQuery } from "@tanstack/react-query";
@@ -17,11 +17,9 @@ const UserReservationHistory = () => {
     return response.data;
   };
 
-  const {
-    data: initialReservationsResponse,
-    isLoading,
-    isFetched,
-  } = useQuery<ApiResponse<Reservation[]>>({
+  const { data: initialReservationsResponse, isLoading } = useQuery<
+    ApiResponse<Reservation[]>
+  >({
     queryKey: ["user-reservations"],
     queryFn: fetchUserReservations,
     enabled: !!session?.accessToken, // Only run if the user is authenticated
@@ -79,7 +77,6 @@ const UserReservationHistory = () => {
                       <div className="text-blue-900">
                         Number of Rooms:{" "}
                         <span className="font-semibold">
-                          {/* @ts-ignore */}
                           {reservation.numberOfRooms! ?? "-"}
                         </span>
                       </div>

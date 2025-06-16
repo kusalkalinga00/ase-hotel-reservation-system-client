@@ -37,7 +37,6 @@ import { useMutation } from "@tanstack/react-query";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { AxiosError } from "axios";
 import { ApiResponse, ReservationResponsePayload } from "@/types/api.types";
-import { before } from "node:test";
 
 interface ReservationFormProps {
   maxOccupants: number;
@@ -150,6 +149,8 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
       form.setValue("name", session.data.user.name || "");
       form.setValue("email", session.data.user.email || "");
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   useEffect(() => {
@@ -186,6 +187,8 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
       form.setValue("checkInDate", "");
       form.setValue("checkOutDate", "");
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange, form.watch("checkInTime")]);
 
   return (
@@ -241,7 +244,7 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
             <FormField
               control={form.control}
               name="checkInDate"
-              render={({ field }) => (
+              render={({}) => (
                 <FormItem>
                   <FormLabel>Check-in Date and Check-out Date</FormLabel>
                   <FormControl>

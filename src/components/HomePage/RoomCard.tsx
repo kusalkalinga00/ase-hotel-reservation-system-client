@@ -11,20 +11,7 @@ import Image from "next/image";
 
 const RoomCard: React.FC<RoomCardProps> = (props) => {
   const router = useRouter();
-  const {
-    id,
-    name,
-    idealFor,
-    capacity,
-    size,
-    bed,
-    view,
-    price,
-    priceTier,
-    image,
-    description,
-    amenities,
-  } = props;
+  const { id, name, capacity, price, image, description, amenities } = props;
 
   const getTypeColor = (type: string) => {
     switch (type) {

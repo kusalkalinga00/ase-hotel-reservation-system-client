@@ -1,6 +1,5 @@
 "use client";
 import ReservationForm from "@/components/ReservationPage/ReservationForm";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { ApiResponse } from "@/types/api.types";
@@ -37,11 +36,7 @@ const ReservationView: React.FC<ReservationViewProps> = (props) => {
     return response.data;
   };
 
-  const {
-    data: roomType,
-    isLoading,
-    isFetched,
-  } = useQuery<ApiResponse<RoomCategory>>({
+  const { data: roomType, isLoading } = useQuery<ApiResponse<RoomCategory>>({
     queryKey: ["roomCategory", roomId],
     queryFn: fetchAllRoomsCategory,
     refetchOnWindowFocus: false,

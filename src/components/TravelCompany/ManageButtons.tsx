@@ -5,8 +5,7 @@ interface ManageButtonsProps {
   reservationId: string;
 }
 
-const ManageButtons: React.FC<ManageButtonsProps> = (props) => {
-  const { reservationId } = props;
+const ManageButtons: React.FC<ManageButtonsProps> = () => {
   return (
     <div className="flex items-center gap-4">
       <Button>Confirm</Button>

@@ -95,6 +95,7 @@ const EarningsView = () => {
       const blob = new Blob([res.data], { type: "application/pdf" });
       saveAs(blob, `manager-summary-${selectedPeriod}.pdf`);
     } catch (err) {
+      console.error("Failed to download PDF report:", err);
       alert("Failed to download PDF report.");
     }
   };
@@ -191,7 +192,6 @@ const EarningsView = () => {
               <Button
                 onClick={handleDownloadPDF}
                 className="ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                
               >
                 Download PDF
               </Button>

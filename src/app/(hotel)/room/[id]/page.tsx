@@ -1,4 +1,3 @@
-import { RoomCategory } from "@/types/room-category.types";
 import RoomView from "@/views/RoomView";
 
 export default async function RoomPage({

@@ -16,11 +16,9 @@ const ReservationsView = () => {
     return response.data;
   };
 
-  const {
-    data: initialReservationsResponse,
-    isLoading,
-    isFetched,
-  } = useQuery<ApiResponse<ClerkReservation[]>>({
+  const { data: initialReservationsResponse } = useQuery<
+    ApiResponse<ClerkReservation[]>
+  >({
     queryKey: ["clerk-reservations"],
     queryFn: fetchUserReservations,
     enabled: !!session?.accessToken,

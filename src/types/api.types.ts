@@ -63,5 +63,5 @@ export interface ClerkReservation {
   customer: Customer;
 }
 
-export interface ClerkReservationsResponsePayload
-  extends Array<ClerkReservation> {}
+// export interface ClerkReservationsResponsePayload
+//   extends Array<ClerkReservation> {}

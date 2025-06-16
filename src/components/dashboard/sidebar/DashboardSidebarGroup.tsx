@@ -6,25 +6,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-  AlertCircle,
-  Book,
-  ChartBarBigIcon,
-  Home,
-  Settings,
-  Earth,
-  Shapes,
-  Car,
-} from "lucide-react";
-import { useSession } from "next-auth/react";
+import { Book, Home, Shapes, Car } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const DashboardSidebarGroup = () => {
-  const [mounted, setMounted] = useState(false);
   const pathName = usePathname();
-  const session = useSession();
 
   // useEffect(() => {
   //   setMounted(true);

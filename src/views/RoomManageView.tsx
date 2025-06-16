@@ -1,6 +1,5 @@
 "use client";
 import RoomsTable from "@/components/roomManagePage/RoomsTable";
-import { Button } from "@/components/ui/button";
 import React from "react";
 import { Room } from "@/types/api.types";
 import useAxiosAuth from "@/hooks/useAxiosAuth";

@@ -1,7 +1,7 @@
 
 import DashBoardHeader from "@/components/dashboard/Header";
 import { AppSidebar } from "@/components/dashboard/sidebar/AppSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({
   children,

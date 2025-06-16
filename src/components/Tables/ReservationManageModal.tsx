@@ -286,7 +286,7 @@ const ReservationManageModal = ({
             <div className="text-sm font-bold">Check-Out Reservation</div>
 
             <div>
-              <div>Payment Method</div>
+              <div className="text-sm mb-2">Payment Method</div>
               <div>
                 <select
                   className="border rounded px-2 py-1 text-sm"

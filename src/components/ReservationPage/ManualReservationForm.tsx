@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { ApiResponse, ReservationResponsePayload } from "@/types/api.types";
+import { AxiosError } from "axios";
 
 interface ManualReservationFormProps {
   defaultRoomType?: string;
@@ -36,8 +37,6 @@ const ManualReservationForm: React.FC<ManualReservationFormProps> = ({
   const axiosAuth = useAxiosAuth();
   const [loading, setLoading] = useState(false);
 
-
-  
   const {
     register,
     handleSubmit,
@@ -69,7 +68,7 @@ const ManualReservationForm: React.FC<ManualReservationFormProps> = ({
       toast.success(data.message || "Reservation created successfully!");
       reset();
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(
         error?.response?.data?.message || "Failed to create reservation"
       );
@@ -134,8 +133,7 @@ const ManualReservationForm: React.FC<ManualReservationFormProps> = ({
                   // Set time to 14:00 UTC for check-in
                   date.setUTCHours(14, 0, 0, 0);
                   const iso = date.toISOString();
-                  // Manually set value in form
-                  // @ts-ignore
+
                   register("checkInDate").onChange({ target: { value: iso } });
                 }
               }}
@@ -162,7 +160,7 @@ const ManualReservationForm: React.FC<ManualReservationFormProps> = ({
                   date.setUTCHours(12, 0, 0, 0);
                   const iso = date.toISOString();
                   // Manually set value in form
-                  // @ts-ignore
+
                   register("checkOutDate").onChange({ target: { value: iso } });
                 }
               }}

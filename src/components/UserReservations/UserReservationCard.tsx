@@ -6,7 +6,6 @@ import {
   Clock,
   Users,
   CreditCard,
-  MapPin,
   Edit,
   X,
   Check,
@@ -38,10 +37,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
-import { format } from "date-fns";
 import { toast } from "sonner";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { ApiResponse } from "@/types/api.types";
 
 interface UserReservationCardProps {
   reservation: Reservation;
@@ -80,7 +80,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
       queryClient.invalidateQueries({ queryKey: ["user-reservations"] });
       setOpenEditDialog(false);
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(
         error?.response?.data?.message || "Failed to update reservation"
       );
@@ -98,7 +98,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
       toast.success("Reservation cancelled successfully");
       queryClient.invalidateQueries({ queryKey: ["user-reservations"] });
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(
         error?.response?.data?.message || "Failed to cancel reservation"
       );
@@ -114,7 +114,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
       toast.success("Reservation deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["user-reservations"] });
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(
         error?.response?.data?.message || "Failed to delete reservation"
       );

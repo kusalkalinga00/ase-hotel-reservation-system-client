@@ -34,4 +34,5 @@ export interface Reservation {
   createdAt: string;
   updatedAt: string;
   room: Room;
+  numberOfRooms?: number;
 }
