@@ -1,11 +1,15 @@
 export interface RoomCardProps {
   id: string;
-  type: "STANDARD" | "DELUXE" | "SUITE" | "RESIDENTIAL_SUITE";
   name: string;
-  description: string;
-  image: string;
+  idealFor: string;
+  capacity: number;
+  size: string;
+  bed: string;
+  view: string;
+  priceTier: string;
   price: number;
-  maxOccupancy: number;
+  image: string;
+  description: string;
   amenities: string[];
   onClick?: (roomId: string) => void;
 }

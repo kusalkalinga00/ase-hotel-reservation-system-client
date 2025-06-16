@@ -6,19 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Users, Wifi, Car, Coffee, Tv, Bath } from "lucide-react";
 import React from "react";
 import { RoomCardProps } from "@/types/home.types";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const RoomCard: React.FC<RoomCardProps> = (props) => {
-  const {
-    id,
-    type,
-    name,
-    description,
-    image,
-    price,
-    maxOccupancy,
-    amenities,
-    onClick,
-  } = props;
+  const router = useRouter();
+  const { id, name, capacity, price, image, description, amenities } = props;
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -52,19 +45,27 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
     }
   };
 
+  const handleSeeMore = () => {
+    router.push(`/room/${id}`);
+  };
+
   return (
     <Card
-      className="overflow-hidden  transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-white dark:bg-[#020517] border-gray-200 dark:border-gray-700"
+      className="overflow-hidden  transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-white dark:bg-[#020517] border-gray-200 dark:border-gray-700 justify-between"
       //   onClick={() => onClick?.(id)}
     >
       <div className="relative">
-        <img
-          src={image || "/placeholder.svg"}
+        <Image
+          src={image || ""}
           alt={name}
-          className="w-full h-48 object-cover"
+          className=" w-full h-[200px] "
+          width={0}
+          height={0}
+          objectFit="cover"
+          sizes="100vw"
         />
-        <Badge className={`absolute top-3 left-3 ${getTypeColor(type)}`}>
-          {type.replace("_", " ")}
+        <Badge className={`absolute top-3 left-3 ${getTypeColor(name)}`}>
+          {name.replace("_", " ")}
         </Badge>
       </div>
 
@@ -81,7 +82,7 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
 
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <Users className="h-4 w-4" />
-            <span>Up to {maxOccupancy} guests</span>
+            <span>Up to {capacity} guests</span>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -104,15 +105,17 @@ const RoomCard: React.FC<RoomCardProps> = (props) => {
       </CardContent>
 
       <CardFooter className="p-4 pt-0 flex items-center justify-between">
-        <div className="text-right">
+        <div className="text-left">
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
             ${price}
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            per night
+            {name === "RESIDENTIAL_SUITE" ? "Weekly Rate" : "Per Night"}
           </div>
         </div>
-        <Button className="ml-4 cursor-pointer">Book Now</Button>
+        <Button className="ml-4 cursor-pointer" onClick={handleSeeMore}>
+          See More
+        </Button>
       </CardFooter>
     </Card>
   );
