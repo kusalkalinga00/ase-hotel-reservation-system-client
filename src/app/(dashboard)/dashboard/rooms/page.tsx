@@ -1,4 +1,4 @@
-import RoomManageView from "@/views/RoomManageView";
+import RoomManageView from "@/views/dashboard/RoomManageView";
 
 function RoomsPage() {
   return <RoomManageView />;

@@ -5,9 +5,11 @@ import { Room } from "@/types/api.types";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { useQuery } from "@tanstack/react-query";
 import AddRoomModal from "@/components/roomManagePage/AddRoomModal";
+import { useSession } from "next-auth/react";
 
 const RoomManageView = () => {
   const axiosAuth = useAxiosAuth();
+  const { data: session } = useSession();
   const {
     data: roomsResponse,
     isLoading,
@@ -18,6 +20,7 @@ const RoomManageView = () => {
       const res = await axiosAuth.get("/rooms");
       return res.data;
     },
+    enabled: !!session?.accessToken,
   });
 
   return (

@@ -1,4 +1,4 @@
-import RegisterView from "@/views/RegisterView";
+import RegisterView from "@/views/auth/RegisterView";
 
 
 export default function RegisterPage() {

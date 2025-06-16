@@ -16,43 +16,33 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Room } from "@/types/api.types";
-import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { Card } from "@/components/ui/card";
-import { useEffect, useState } from "react";
 import DeletRoom from "@/components/roomManagePage/DeletRoom";
-
-interface RoomCategory {
-  id: string;
-  name: string;
-}
+import RoomType from "./RoomType";
 
 export const columns: ColumnDef<Room>[] = [
   {
     header: "Room Number",
     accessorKey: "number",
-    cell: ({ row }) => row.original.number,
+    cell: ({ row }: { row: { original: Room } }) => row.original.number,
   },
   {
     header: "Type",
     accessorKey: "type",
-    // cell: ({ row, table }) => {
-    //   const roomCategories: RoomCategory[] =
-    //     table.options.meta?.roomCategories || [];
-    //   const category = roomCategories.find(
-    //     (cat) => cat.id === row.original.roomCategoryId
-    //   );
-    //   return category ? category.name : row.original.roomCategoryId;
-    // },
+    cell: ({ row }) => {
+      const room = row.original.roomCategoryId;
+      return <RoomType roomCategoryId={room} />;
+    },
   },
   {
     header: "Status",
     accessorKey: "status",
-    cell: ({ row }) => row.original.status,
+    cell: ({ row }: { row: { original: Room } }) => row.original.status,
   },
   {
     header: "Manage",
     accessorKey: "id",
-    cell: ({ row }) => {
+    cell: ({ row }: { row: { original: Room } }) => {
       const roomId = row.original.id;
       return <DeletRoom roomId={roomId} />;
     },
@@ -64,21 +54,11 @@ interface RoomsTableProps {
 }
 
 const RoomsTable = ({ rooms }: RoomsTableProps) => {
-  const [roomCategories, setRoomCategories] = useState<RoomCategory[]>([]);
-  const axiosAuth = useAxiosAuth();
-
-  useEffect(() => {
-    axiosAuth.get("/room-categories").then((res) => {
-      setRoomCategories(res.data.payload || []);
-    });
-  }, [axiosAuth]);
-
-  const table = useReactTable({
+  const table = useReactTable<Room>({
     data: rooms,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    meta: { roomCategories },
   });
 
   return (

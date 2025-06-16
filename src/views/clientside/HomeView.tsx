@@ -25,7 +25,7 @@ const HomeView = () => {
   };
 
   const { data: roomTypes, isLoading } = useQuery<ApiResponse<RoomCategory[]>>({
-    queryKey: ["roomCategories"],
+    queryKey: ["room-categories"],
     queryFn: fetchAllRoomsCategories,
     refetchOnWindowFocus: false,
   });

@@ -1,4 +1,4 @@
-import ReservationView from "@/views/ReservationView";
+import ReservationView from "@/views/clientside/ReservationView";
 
 export default async function ReservationPage({
   params,

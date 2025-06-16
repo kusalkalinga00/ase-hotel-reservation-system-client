@@ -1,4 +1,4 @@
-import EarningsView from "@/views/EarningsView";
+import EarningsView from "@/views/dashboard/EarningsView";
 import React from "react";
 
 function EarningsPage() {

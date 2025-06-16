@@ -22,7 +22,7 @@ const UserReservationHistory = () => {
   >({
     queryKey: ["user-reservations"],
     queryFn: fetchUserReservations,
-    enabled: !!session?.accessToken, // Only run if the user is authenticated
+    enabled: !!session?.accessToken,
   });
 
   return (
