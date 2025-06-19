@@ -154,7 +154,9 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
 
   const canCancel = (reservation: Reservation) => {
     return (
-      reservation.status !== "CHECKED_OUT" && reservation.status !== "CANCELLED"
+      reservation.status !== "CHECKED_OUT" &&
+      reservation.status !== "CANCELLED" &&
+      reservation.status !== "CHECKED_IN"
     );
   };
 
@@ -401,7 +403,10 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
 
           {canCancel(reservation) && (
             <AlertDialog>
-              <AlertDialogTrigger asChild>
+              <AlertDialogTrigger
+                asChild
+                // disabled={reservation.status === "CHECKED_IN"}
+              >
                 <Button variant="destructive" size="sm">
                   <X className="h-4 w-4 " />
                   Cancel Booking
