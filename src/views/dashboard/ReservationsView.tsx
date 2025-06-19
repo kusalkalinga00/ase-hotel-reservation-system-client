@@ -16,9 +16,11 @@ const ReservationsView = () => {
     return response.data;
   };
 
-  const { data: initialReservationsResponse } = useQuery<
-    ApiResponse<ClerkReservation[]>
-  >({
+  const {
+    data: initialReservationsResponse,
+    isLoading,
+    isFetching,
+  } = useQuery<ApiResponse<ClerkReservation[]>>({
     queryKey: ["clerk-reservations"],
     queryFn: fetchUserReservations,
     enabled: !!session?.accessToken,
@@ -26,8 +28,28 @@ const ReservationsView = () => {
 
   return (
     <div className="py-10 px-5 w-full">
-      {initialReservationsResponse?.payload && (
-        <ReservationTable data={initialReservationsResponse?.payload || []} />
+      {isLoading || isFetching ? (
+        <div className="text-center text-muted-foreground py-12">
+          Loading reservations...
+        </div>
+      ) : !initialReservationsResponse?.payload?.length ? (
+        <div className="text-center text-muted-foreground py-12">
+          You have no reservations.
+        </div>
+      ) : (
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">Reservations</h1>
+          <p className="text-muted-foreground my-2">
+            View and manage all hotel bookings
+          </p>
+          <>
+            {initialReservationsResponse?.payload && (
+              <ReservationTable
+                data={initialReservationsResponse?.payload || []}
+              />
+            )}
+          </>
+        </div>
       )}
 
       <ManualReservationForm />

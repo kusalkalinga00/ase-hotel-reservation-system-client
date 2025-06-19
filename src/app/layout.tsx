@@ -30,11 +30,11 @@ export default function RootLayout({
 }>) {
   return (
     <AuthProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-min`}
-        >
-          <ReactQueryProvider>
+      <ReactQueryProvider>
+        <html lang="en" suppressHydrationWarning>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-min`}
+          >
             <ThemeProvider
               attribute="class"
               defaultTheme="light"
@@ -45,9 +45,9 @@ export default function RootLayout({
 
               <Toaster position="top-right" />
             </ThemeProvider>
-          </ReactQueryProvider>
-        </body>
-      </html>
+          </body>
+        </html>
+      </ReactQueryProvider>
     </AuthProvider>
   );
 }
