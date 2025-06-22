@@ -27,7 +27,7 @@ import {
 } from "@/zod-schema/reservation.schema";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSession } from "next-auth/react";
-import { MoveUp } from "lucide-react";
+import { Loader2, MoveUp } from "lucide-react";
 import CreditCardForm, {
   CreditCardFormHandle,
 } from "@/components/ReservationPage/CreditCardForm";
@@ -97,7 +97,7 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
       router.push("/reservations");
     },
     onError: (error: AxiosError<ApiResponse<null>>) => {
-      console.error("Error updating team", error);
+      console.log("Error creating reservation", error);
       toast.error(error.response?.data.message || "An error occurred");
     },
   });
@@ -360,8 +360,15 @@ const ReservationForm: React.FC<ReservationFormProps> = (props) => {
       )}
 
       <div className="px-5">
-        <Button className="w-full" onClick={handleReservationSubmit}>
-          Reserve
+        <Button
+          className="w-full"
+          disabled={handleReservationMutation.isPending}
+          onClick={handleReservationSubmit}
+        >
+          Reserve{" "}
+          {handleReservationMutation.isPending && (
+            <Loader2 className="animate-spin mr-1 w-2 h-2" />
+          )}
         </Button>
       </div>
 

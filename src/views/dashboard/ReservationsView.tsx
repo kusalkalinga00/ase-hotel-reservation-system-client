@@ -11,47 +11,43 @@ const ReservationsView = () => {
   const axiosAuth = useAxiosAuth();
   const { data: session } = useSession();
 
-  const fetchUserReservations = async () => {
-    const response = await axiosAuth.get("/reservations");
-    return response.data;
-  };
-
   const {
-    data: initialReservationsResponse,
+    data: reservationsResponse,
     isLoading,
     isFetching,
   } = useQuery<ApiResponse<ClerkReservation[]>>({
     queryKey: ["clerk-reservations"],
-    queryFn: fetchUserReservations,
+    queryFn: async () => {
+      const response = await axiosAuth.get("/reservations");
+      return response.data;
+    },
     enabled: !!session?.accessToken,
   });
 
+  const hasReservations =
+    !!reservationsResponse?.payload && reservationsResponse.payload.length > 0;
+
   return (
     <div className="py-10 px-5 w-full">
-      {isLoading || isFetching ? (
+      {(isLoading || isFetching) && (
         <div className="text-center text-muted-foreground py-12">
           Loading reservations...
         </div>
-      ) : !initialReservationsResponse?.payload?.length ? (
+      )}
+      {!isLoading && !isFetching && !hasReservations && (
         <div className="text-center text-muted-foreground py-12">
           You have no reservations.
         </div>
-      ) : (
+      )}
+      {!isLoading && !isFetching && hasReservations && (
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">Reservations</h1>
           <p className="text-muted-foreground my-2">
             View and manage all hotel bookings
           </p>
-          <>
-            {initialReservationsResponse?.payload && (
-              <ReservationTable
-                data={initialReservationsResponse?.payload || []}
-              />
-            )}
-          </>
+          <ReservationTable data={reservationsResponse.payload} />
         </div>
       )}
-
       <ManualReservationForm />
     </div>
   );

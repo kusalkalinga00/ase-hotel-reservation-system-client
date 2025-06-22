@@ -307,9 +307,9 @@ const RoomView: React.FC<RoomViewProps> = (props) => {
                                 <div className="font-medium">
                                   Room {room.number}
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                {/* <div className="text-sm text-gray-600">
                                   {room.status}
-                                </div>
+                                </div> */}
                               </div>
                             </div>
                             <Badge
