@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,10 +11,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosAuth from "@/hooks/useAxiosAuth";
 import { ApiResponse, ReservationResponsePayload } from "@/types/api.types";
 import { AxiosError } from "axios";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  ManualReservationSchemaType,
+  ManualReservationSchema,
+} from "@/zod-schema/manual-reservation.schema";
+import { DayPicker } from "react-day-picker";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface ManualReservationFormProps {
   defaultRoomType?: string;
@@ -22,8 +36,8 @@ interface ManualReservationFormProps {
 
 interface ManualReservationPayload {
   email: string;
+  name: string;
   roomType: string;
-  checkInDate: string;
   checkOutDate: string;
   occupants: number;
   creditCard: string;
@@ -36,20 +50,20 @@ const ManualReservationForm: React.FC<ManualReservationFormProps> = ({
 }) => {
   const axiosAuth = useAxiosAuth();
   const [loading, setLoading] = useState(false);
+  const [checkOutDate, setCheckOutDate] = useState<Date | undefined>();
+  const [checkOutTime, setCheckOutTime] = useState("12:00");
+  const today = new Date();
+  const queryClient = useQueryClient();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ManualReservationPayload>({
+  const form = useForm<ManualReservationSchemaType>({
+    resolver: zodResolver(ManualReservationSchema),
     defaultValues: {
+      name: "",
       email: "",
       roomType: defaultRoomType,
-      checkInDate: "",
       checkOutDate: "",
       occupants: 1,
-      creditCard: "",
+      creditCardNumber: "",
       creditCardExpiry: "",
       creditCardCVV: "",
     },
@@ -66,7 +80,10 @@ const ManualReservationForm: React.FC<ManualReservationFormProps> = ({
     },
     onSuccess: (data: ApiResponse<ReservationResponsePayload>) => {
       toast.success(data.message || "Reservation created successfully!");
-      reset();
+      form.reset();
+      queryClient.invalidateQueries({
+        queryKey: ["clerk-reservations"],
+      });
     },
     onError: (error: AxiosError<ApiResponse<null>>) => {
       toast.error(
@@ -76,6 +93,40 @@ const ManualReservationForm: React.FC<ManualReservationFormProps> = ({
     onSettled: () => setLoading(false),
   });
 
+  useEffect(() => {
+    if (checkOutDate) {
+      const [checkOutHour, checkOutMinute] = checkOutTime.split(":");
+      const checkOutDateTime = new Date(
+        Date.UTC(
+          checkOutDate.getFullYear(),
+          checkOutDate.getMonth(),
+          checkOutDate.getDate(),
+          Number(checkOutHour),
+          Number(checkOutMinute),
+          0,
+          0
+        )
+      ).toISOString();
+      form.setValue("checkOutDate", checkOutDateTime);
+    } else {
+      form.setValue("checkOutDate", "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkOutDate, checkOutTime]);
+
+  const onSubmit = (data: ManualReservationSchemaType) => {
+    mutation.mutate({
+      email: data.email,
+      name: data.name,
+      roomType: data.roomType,
+      checkOutDate: data.checkOutDate,
+      occupants: data.occupants,
+      creditCard: data.creditCardNumber,
+      creditCardExpiry: data.creditCardExpiry,
+      creditCardCVV: data.creditCardCVV,
+    });
+  };
+
   return (
     <Card className="max-w-md w-full mt-8">
       <CardHeader>
@@ -84,152 +135,157 @@ const ManualReservationForm: React.FC<ManualReservationFormProps> = ({
           Fill in the details to add a reservation manually.
         </CardDescription>
       </CardHeader>
-      <form
-        onSubmit={handleSubmit((values) => mutation.mutate(values))}
-        className="space-y-4"
-      >
-        <CardContent className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <Input
-              type="email"
-              {...register("email", { required: true })}
-              placeholder="customer@example.com"
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit, (errors) =>
+            console.log("Invalid", errors)
+          )}
+          className="space-y-4"
+        >
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.email && (
-              <span className="text-xs text-red-500">Email is required</span>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Room Type</label>
-            <select
-              {...register("roomType", { required: true })}
-              className="w-full border rounded px-3 py-2 text-sm"
-              defaultValue={defaultRoomType}
-            >
-              <option value="STANDARD">STANDARD</option>
-              <option value="DELUXE">DELUXE</option>
-              <option value="SUITE">SUITE</option>
-              <option value="RESIDENTIAL_SUITE">RESIDENTIAL_SUITE</option>
-            </select>
-            {errors.roomType && (
-              <span className="text-xs text-red-500">
-                Room type is required
-              </span>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Check-in Date (UTC ISO)
-            </label>
-            <Input
-              type="datetime-local"
-              {...register("checkInDate", { required: true })}
-              onChange={(e) => {
-                // Convert local datetime to UTC ISO string
-                const val = e.target.value;
-                if (val) {
-                  const date = new Date(val);
-                  // Set time to 14:00 UTC for check-in
-                  date.setUTCHours(14, 0, 0, 0);
-                  const iso = date.toISOString();
 
-                  register("checkInDate").onChange({ target: { value: iso } });
-                }
-              }}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="customer@example.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.checkInDate && (
-              <span className="text-xs text-red-500">
-                Check-in date is required
-              </span>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Check-out Date (UTC ISO)
-            </label>
-            <Input
-              type="datetime-local"
-              {...register("checkOutDate", { required: true })}
-              onChange={(e) => {
-                // Convert local datetime to UTC ISO string
-                const val = e.target.value;
-                if (val) {
-                  const date = new Date(val);
-                  // Set time to 12:00 UTC for check-out
-                  date.setUTCHours(12, 0, 0, 0);
-                  const iso = date.toISOString();
-                  // Manually set value in form
+            <FormField
+              control={form.control}
+              name="roomType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Room Type</FormLabel>
+                  <FormControl>
+                    <select
+                      className="w-full border rounded px-3 py-2 text-sm"
+                      {...field}
+                    >
+                      <option value="STANDARD">STANDARD</option>
+                      <option value="DELUXE">DELUXE</option>
+                      <option value="SUITE">SUITE</option>
+                      <option value="RESIDENTIAL_SUITE">
+                        RESIDENTIAL_SUITE
+                      </option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                  register("checkOutDate").onChange({ target: { value: iso } });
-                }
-              }}
+            <FormField
+              control={form.control}
+              name="occupants"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Occupants</FormLabel>
+                  <FormControl>
+                    <Input type="number" min={1} step={1} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.checkOutDate && (
-              <span className="text-xs text-red-500">
-                Check-out date is required
-              </span>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Occupants</label>
-            <Input
-              type="number"
-              min={1}
-              step={1}
-              {...register("occupants", {
-                required: true,
-                min: 1,
-                valueAsNumber: true,
-              })}
+            <FormField
+              control={form.control}
+              name="creditCardNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Credit Card Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="4111111111111111" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.occupants && (
-              <span className="text-xs text-red-500">At least 1 occupant</span>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Credit Card Number
-            </label>
-            <Input
-              {...register("creditCard", { required: true })}
-              placeholder="4111111111111111"
+            <FormField
+              control={form.control}
+              name="creditCardExpiry"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Credit Card Expiry</FormLabel>
+                  <FormControl>
+                    <Input placeholder="12/27" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.creditCard && (
-              <span className="text-xs text-red-500">
-                Credit card is required
-              </span>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Credit Card Expiry
-            </label>
-            <Input
-              {...register("creditCardExpiry", { required: true })}
-              placeholder="12/27"
+            <FormField
+              control={form.control}
+              name="creditCardCVV"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Credit Card CVV</FormLabel>
+                  <FormControl>
+                    <Input placeholder="123" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.creditCardExpiry && (
-              <span className="text-xs text-red-500">Expiry is required</span>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Credit Card CVV
-            </label>
-            <Input
-              {...register("creditCardCVV", { required: true })}
-              placeholder="123"
+            <FormField
+              control={form.control}
+              name="checkOutDate"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Check-out Date</FormLabel>
+                  <FormControl>
+                    <DayPicker
+                      mode="single"
+                      disabled={{ before: today }}
+                      selected={checkOutDate}
+                      onSelect={setCheckOutDate}
+                      required
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {errors.creditCardCVV && (
-              <span className="text-xs text-red-500">CVV is required</span>
-            )}
-          </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Submitting..." : "Add Reservation"}
-          </Button>
-        </CardContent>
-      </form>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Check-out Time
+              </label>
+              <Input
+                type="time"
+                value={checkOutTime}
+                onChange={(e) => setCheckOutTime(e.target.value)}
+                className="w-[120px]"
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Submitting..." : "Add Reservation"}
+            </Button>
+          </CardContent>
+        </form>
+      </Form>
     </Card>
   );
 };
