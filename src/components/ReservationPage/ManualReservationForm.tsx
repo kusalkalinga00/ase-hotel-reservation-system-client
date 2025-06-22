@@ -18,7 +18,6 @@ import { AxiosError } from "axios";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -28,9 +27,8 @@ import {
   ManualReservationSchemaType,
   ManualReservationSchema,
 } from "@/zod-schema/manual-reservation.schema";
-import { DateRange, DayPicker } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 interface ManualReservationFormProps {
   defaultRoomType?: string;
