@@ -46,7 +46,7 @@ const HomeView = () => {
             </div>
             <div className="flex gap-2 justify-center md:justify-end">
               <Button
-                className="bg-blue-600 text-white font-semibold px-4 py-2 rounded hover:bg-blue-700 transition"
+                className="bg-blue-600 cursor-pointer text-white font-semibold px-4 py-2 rounded hover:bg-blue-700 transition"
                 onClick={() => router.push("/travel-agent-book")}
               >
                 Book

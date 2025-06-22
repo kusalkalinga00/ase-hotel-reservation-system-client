@@ -191,7 +191,7 @@ const EarningsView = () => {
               </Select>
               <Button
                 onClick={handleDownloadPDF}
-                className="ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                className="ml-4 bg-blue-600 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-700 transition "
               >
                 Download PDF
               </Button>
