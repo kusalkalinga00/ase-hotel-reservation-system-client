@@ -85,10 +85,7 @@ const RoomView: React.FC<RoomViewProps> = (props) => {
     return response.data;
   };
 
-  const {
-    data: roomType,
-    isLoading,
-  } = useQuery<ApiResponse<RoomCategory>>({
+  const { data: roomType, isLoading } = useQuery<ApiResponse<RoomCategory>>({
     queryKey: ["roomCategory", roomCategoryId],
     queryFn: fetchAllRoomsCategory,
     refetchOnWindowFocus: false,
@@ -294,37 +291,35 @@ const RoomView: React.FC<RoomViewProps> = (props) => {
                     <CardHeader>
                       <CardTitle className="flex items-center space-x-2">
                         <MapPin className="h-5 w-5" />
-                        <span>Available Rooms</span>
+                        <span>Rooms</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        {roomType.payload.rooms
-                          .filter((room) => room.status === "AVAILABLE")
-                          .map((room) => (
-                            <div
-                              key={room.id}
-                              className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200"
-                            >
-                              <div className="flex items-center space-x-3">
-                                <CheckCircle className="h-5 w-5 text-green-600" />
-                                <div>
-                                  <div className="font-medium">
-                                    Room {room.number}
-                                  </div>
-                                  <div className="text-sm text-gray-600">
-                                    {room.status}
-                                  </div>
+                        {roomType.payload.rooms.map((room) => (
+                          <div
+                            key={room.id}
+                            className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <CheckCircle className="h-5 w-5 text-green-600" />
+                              <div>
+                                <div className="font-medium">
+                                  Room {room.number}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {room.status}
                                 </div>
                               </div>
-                              <Badge
-                                variant="outline"
-                                className="text-green-700 border-green-300"
-                              >
-                                Available
-                              </Badge>
                             </div>
-                          ))}
+                            <Badge
+                              variant="outline"
+                              className="text-green-700 border-green-300"
+                            >
+                              Available
+                            </Badge>
+                          </div>
+                        ))}
                       </div>
                       <Separator className="my-4" />
                       <div className="text-sm text-gray-600 text-center">
