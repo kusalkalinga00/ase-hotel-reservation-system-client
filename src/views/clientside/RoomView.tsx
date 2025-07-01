@@ -276,7 +276,7 @@ const RoomView: React.FC<RoomViewProps> = (props) => {
                           {roomType.payload.priceTier}
                         </Badge>
                         <Button
-                          className="w-full"
+                          className="w-full cursor-pointer"
                           size="lg"
                           onClick={handleBookFunction}
                         >

@@ -6,6 +6,7 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  Row,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -18,7 +19,7 @@ import {
 } from "@/components/ui/table";
 
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ClerkReservation } from "@/types/api.types";
 import {
   Select,
@@ -30,16 +31,37 @@ import {
 import { Label } from "@/components/ui/label";
 import ReservationManageModal from "./ReservationManageModal";
 
+// Helper function to format date - memoized to avoid recalculation
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return `${date.getUTCDate().toString().padStart(2, "0")}/${(
+    date.getUTCMonth() + 1
+  )
+    .toString()
+    .padStart(2, "0")}/${date.getUTCFullYear()}, ${date
+    .getUTCHours()
+    .toString()
+    .padStart(2, "0")}:${date.getUTCMinutes().toString().padStart(2, "0")}`;
+};
+
+// Helper function for name filtering
+
+const nameFilterFn = (
+  row: Row<ClerkReservation>,
+  columnId: string,
+  filterValue: string
+) => {
+  return row.original.customer.name
+    .toLowerCase()
+    .includes(filterValue.toLowerCase());
+};
+
 export const columns: ColumnDef<ClerkReservation>[] = [
   {
     header: "Customer Name",
     accessorKey: "customerName",
     cell: ({ row }) => row.original.customer.name,
-    filterFn: (row, columnId, filterValue) => {
-      return row.original.customer.name
-        .toLowerCase()
-        .includes((filterValue as string).toLowerCase());
-    },
+    filterFn: nameFilterFn,
   },
   {
     header: "Occupancy",
@@ -58,34 +80,12 @@ export const columns: ColumnDef<ClerkReservation>[] = [
   {
     header: "Check-In Date",
     accessorKey: "checkInDate",
-    cell: ({ row }) => {
-      const date = new Date(row.original.checkInDate);
-      // Show UTC date and time as in API
-      return `${date.getUTCDate().toString().padStart(2, "0")}/${(
-        date.getUTCMonth() + 1
-      )
-        .toString()
-        .padStart(2, "0")}/${date.getUTCFullYear()}, ${date
-        .getUTCHours()
-        .toString()
-        .padStart(2, "0")}:${date.getUTCMinutes().toString().padStart(2, "0")}`;
-    },
+    cell: ({ row }) => formatDate(row.original.checkInDate),
   },
   {
     header: "Check-Out Date",
     accessorKey: "checkOutDate",
-    cell: ({ row }) => {
-      const date = new Date(row.original.checkOutDate);
-      // Show UTC date and time as in API
-      return `${date.getUTCDate().toString().padStart(2, "0")}/${(
-        date.getUTCMonth() + 1
-      )
-        .toString()
-        .padStart(2, "0")}/${date.getUTCFullYear()}, ${date
-        .getUTCHours()
-        .toString()
-        .padStart(2, "0")}:${date.getUTCMinutes().toString().padStart(2, "0")}`;
-    },
+    cell: ({ row }) => formatDate(row.original.checkOutDate),
   },
   {
     header: "Status",
@@ -118,14 +118,17 @@ const RESERVATION_STATUSES = [
   "NO_SHOW",
 ];
 
-const ReservationTable: React.FC<ReservationTableProps> = (props) => {
-  const { data } = props;
+const ReservationTable: React.FC<ReservationTableProps> = ({ data }) => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const filteredData = data.filter(
-    (reservation) => reservation.customer?.role !== "TRAVEL_COMPANY"
-  );
+  // Memoize filtered data to avoid recalculation on every render
+  const filteredData = useMemo(() => {
+    return data.filter(
+      (reservation) => reservation.customer?.role !== "TRAVEL_COMPANY"
+    );
+  }, [data]);
 
+  // Memoize table configuration
   const table = useReactTable({
     data: filteredData,
     columns,
@@ -137,17 +140,30 @@ const ReservationTable: React.FC<ReservationTableProps> = (props) => {
     onColumnFiltersChange: setColumnFilters,
   });
 
+  // Memoize filter handlers to avoid recreating on every render
+  const handleStatusFilterChange = useCallback(
+    (value: string) => {
+      table
+        .getColumn("status")
+        ?.setFilterValue(value === "all" ? undefined : value);
+    },
+    [table]
+  );
+
+  const handleNameFilterChange = useCallback(
+    (value: string) => {
+      table.getColumn("customerName")?.setFilterValue(value || undefined);
+    },
+    [table]
+  );
+
   return (
     <Card className="p-4 w-full">
       <div className="mb-4 flex items-center gap-4">
         <Label>Filter by Status:</Label>
         <Select
           value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}
-          onValueChange={(value) =>
-            table
-              .getColumn("status")
-              ?.setFilterValue(value === "all" ? undefined : value)
-          }
+          onValueChange={handleStatusFilterChange}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="All" />
@@ -171,11 +187,7 @@ const ReservationTable: React.FC<ReservationTableProps> = (props) => {
           value={
             (table.getColumn("customerName")?.getFilterValue() as string) ?? ""
           }
-          onChange={(e) =>
-            table
-              .getColumn("customerName")
-              ?.setFilterValue(e.target.value || undefined)
-          }
+          onChange={(e) => handleNameFilterChange(e.target.value)}
         />
       </div>
       <Table>

@@ -19,7 +19,7 @@ const ContactView = () => {
                 <p>No. 17 Beach Road, Mount Lavinia</p>
                 <p>Colombo 10370, Sri Lanka</p>
               </div>
-              <Button variant="outline" className="mb-6">
+              <Button variant="outline" className="mb-6 cursor-pointer">
                 View on Google maps
               </Button>
 
@@ -83,19 +83,19 @@ const ContactView = () => {
               <div className="flex gap-4">
                 <Button
                   variant="secondary"
-                  className="bg-gray-200 hover:bg-gray-300"
+                  className="bg-gray-200 cursor-pointer hover:bg-gray-300"
                 >
                   Instagram
                 </Button>
                 <Button
                   variant="secondary"
-                  className="bg-gray-200 hover:bg-gray-300"
+                  className="bg-gray-200 cursor-pointer hover:bg-gray-300"
                 >
                   Facebook
                 </Button>
                 <Button
                   variant="secondary"
-                  className="bg-gray-200 hover:bg-gray-300"
+                  className="bg-gray-200 cursor-pointer hover:bg-gray-300"
                 >
                   TripAdvisor
                 </Button>
@@ -173,7 +173,7 @@ const ContactView = () => {
 
                   <Button
                     type="submit"
-                    className="w-full bg-gray-800 hover:bg-gray-900 text-white"
+                    className="w-full cursor-pointer bg-gray-800 hover:bg-gray-900 text-white"
                   >
                     Send Message
                   </Button>

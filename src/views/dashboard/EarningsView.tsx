@@ -34,6 +34,36 @@ import { ApiResponse } from "@/types/api.types";
 import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
 
+interface StatusBreakdown {
+  PENDING: number;
+  CONFIRMED: number;
+  CANCELLED: number;
+  CHECKED_IN: number;
+  CHECKED_OUT: number;
+}
+
+interface TravelCompanyData {
+  totalReservations: number;
+  totalRooms: number;
+  revenue: number;
+  pendingAmount: number;
+  statusBreakdown: StatusBreakdown;
+}
+
+interface ManagerSummaryReport {
+  period: string;
+  startDate: string;
+  endDate: string;
+  totalReservations: number;
+  cancelledCount: number;
+  checkedInCount: number;
+  checkedOutCount: number;
+  totalRooms: number;
+  roomStatusCounts: Record<string, number>;
+  totalRevenue: number;
+  travelCompanyData: TravelCompanyData;
+}
+
 const WarningAlert = ({
   title,
   description,
@@ -46,20 +76,6 @@ const WarningAlert = ({
     <span className="block sm:inline">{description}</span>
   </div>
 );
-
-// Types for manager summary report
-interface ManagerSummaryReport {
-  period: string;
-  startDate: string;
-  endDate: string;
-  totalReservations: number;
-  cancelledCount: number;
-  checkedInCount: number;
-  checkedOutCount: number;
-  totalRooms: number;
-  roomStatusCounts: Record<string, number>;
-  revenue: number;
-}
 
 const EarningsView = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<"daily" | "monthly">(
@@ -191,7 +207,7 @@ const EarningsView = () => {
               </Select>
               <Button
                 onClick={handleDownloadPDF}
-                className="ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                className="ml-4 bg-blue-600 cursor-pointer text-white px-4 py-2 rounded hover:bg-blue-700 transition "
               >
                 Download PDF
               </Button>
@@ -237,7 +253,7 @@ const EarningsView = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {formatCurrency(data.revenue)}
+                  {formatCurrency(data.totalRevenue)}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {selectedPeriod === "monthly"
@@ -342,6 +358,67 @@ const EarningsView = () => {
             </Card>
           </div>
 
+          {/* Travel Company Data */}
+          <div className="mt-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Travel Companies Statistics</CardTitle>
+                <CardDescription>
+                  Overview of travel companies reservations and revenue
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                  <div className="space-y-1 text-center">
+                    <p className="text-2xl font-bold text-blue-600">
+                      {data.travelCompanyData.totalReservations}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Total Reservations
+                    </p>
+                  </div>
+                  <div className="space-y-1 text-center">
+                    <p className="text-2xl font-bold text-green-600">
+                      {formatCurrency(data.travelCompanyData.revenue)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Revenue</p>
+                  </div>
+                  <div className="space-y-1 text-center">
+                    <p className="text-2xl font-bold text-orange-600">
+                      {formatCurrency(data.travelCompanyData.pendingAmount)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Pending Amount
+                    </p>
+                  </div>
+                  <div className="space-y-1 text-center">
+                    <p className="text-2xl font-bold text-purple-600">
+                      {data.travelCompanyData.totalRooms}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Total Rooms</p>
+                  </div>
+                </div>
+
+                {/* Status Breakdown */}
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-medium mb-4">Status Breakdown</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {Object.entries(data.travelCompanyData.statusBreakdown).map(
+                      ([status, count]) => (
+                        <div key={status} className="text-center space-y-1">
+                          <p className="text-lg font-semibold">{count}</p>
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {status.toLowerCase().replace("_", " ")}
+                          </p>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Summary Card */}
           <div className="mt-8">
             <Card>
@@ -380,7 +457,7 @@ const EarningsView = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="text-2xl font-bold text-purple-600">
-                      {formatCurrency(data.revenue)}
+                      {formatCurrency(data.totalRevenue)}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Total Revenue

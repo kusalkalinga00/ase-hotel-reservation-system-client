@@ -85,7 +85,7 @@ const TravelCompanyBookingForm = () => {
           dateRange.from.getFullYear(),
           dateRange.from.getMonth(),
           dateRange.from.getDate(),
-          14,
+          11,
           0,
           0,
           0
@@ -96,7 +96,7 @@ const TravelCompanyBookingForm = () => {
           dateRange.to.getFullYear(),
           dateRange.to.getMonth(),
           dateRange.to.getDate(),
-          12,
+          11,
           0,
           0,
           0

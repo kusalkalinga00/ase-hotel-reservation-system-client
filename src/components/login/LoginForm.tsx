@@ -129,13 +129,17 @@ const LoginForm = () => {
               />
             </div>
             <div className="mt-6 flex flex-col gap-2">
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={loading}
+              >
                 {loading ? "Logging in..." : "Login"}
               </Button>
               <div className="text-center text-xs">or</div>
               <Button
                 type="button"
-                className="w-full"
+                className="w-full cursor-pointer"
                 variant={"outline"}
                 onClick={() => router.push("/register")}
                 disabled={loading}

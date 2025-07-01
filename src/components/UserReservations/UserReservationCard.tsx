@@ -303,6 +303,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
                   variant="outline"
                   size="sm"
                   onClick={() => handleEditClick(reservation)}
+                  className="cursor-pointer"
                 >
                   <Edit className="h-4 w-4" />
                   Edit Booking
@@ -389,10 +390,11 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
                       setEditingReservation(null);
                       setOpenEditDialog(false);
                     }}
+                    className="cursor-pointer"
                   >
                     Close
                   </Button>
-                  <Button onClick={handleSaveEdit}>
+                  <Button onClick={handleSaveEdit} className="cursor-pointer">
                     <Check className="h-4 w-4 " />
                     Save Changes
                   </Button>
@@ -407,7 +409,11 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
                 asChild
                 // disabled={reservation.status === "CHECKED_IN"}
               >
-                <Button variant="destructive" size="sm">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="cursor-pointer"
+                >
                   <X className="h-4 w-4 " />
                   Cancel Booking
                 </Button>
@@ -443,6 +449,7 @@ const UserReservationCard: React.FC<UserReservationCardProps> = (props) => {
               size="sm"
               onClick={() => handleDeleteReservation(reservation.id)}
               disabled={deleteMutation.isPending}
+              className="cursor-pointer"
             >
               <X className="h-4 w-4 " />
               Delete
