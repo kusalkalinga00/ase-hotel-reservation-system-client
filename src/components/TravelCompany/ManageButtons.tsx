@@ -24,7 +24,7 @@ const ManageButtons: React.FC<ManageButtonsProps> = (props) => {
       );
       return response.data;
     },
-    onSuccess: (data: ApiResponse<any>) => {
+    onSuccess: (data: ApiResponse<null>) => {
       toast.success(data.message || "Reservation confirmed successfully!");
       queryClient.invalidateQueries({
         queryKey: ["clerk-reservations"],
@@ -46,7 +46,7 @@ const ManageButtons: React.FC<ManageButtonsProps> = (props) => {
       );
       return response.data;
     },
-    onSuccess: (data: ApiResponse<any>) => {
+    onSuccess: (data: ApiResponse<null>) => {
       toast.success(data.message || "Reservation cancelled successfully!");
       queryClient.invalidateQueries({
         queryKey: ["clerk-reservations"],

@@ -6,6 +6,7 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  Row,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -44,7 +45,12 @@ const formatDate = (dateString: string) => {
 };
 
 // Helper function for name filtering
-const nameFilterFn = (row: any, columnId: string, filterValue: string) => {
+
+const nameFilterFn = (
+  row: Row<ClerkReservation>,
+  columnId: string,
+  filterValue: string
+) => {
   return row.original.customer.name
     .toLowerCase()
     .includes(filterValue.toLowerCase());
