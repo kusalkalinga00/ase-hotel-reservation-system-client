@@ -22,6 +22,7 @@ const ReservationsView = () => {
       return response.data;
     },
     enabled: !!session?.accessToken,
+    refetchOnWindowFocus: false,
   });
 
   const hasReservations =
