@@ -78,10 +78,10 @@ const ReservationManageModal = ({
     },
   });
 
-  // PATCH /{id} for editing check-out date
+  // /reservations/{id}/checkout-date for editing check-out date
   const editCheckOutMutation = useMutation({
     mutationFn: async (isoString: string) => {
-      await axiosAuth.patch(`/reservations/${reservationId}`, {
+      await axiosAuth.patch(`/reservations/${reservationId}/checkout-date`, {
         checkOutDate: isoString,
       });
     },
