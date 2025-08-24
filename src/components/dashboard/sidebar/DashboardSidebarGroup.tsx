@@ -75,6 +75,19 @@ const DashboardSidebarGroup = () => {
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            tooltip={"Manage Clerks"}
+            className="flex items-center"
+            asChild
+            isActive={pathName === "/dashboard/manage-clerks"}
+          >
+            <Link href={"/dashboard/manage-clerks"}>
+              <Car size={20} />
+              Manage Clerks
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   );
