@@ -7,17 +7,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Book, Home, Shapes, Car } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const DashboardSidebarGroup = () => {
   const pathName = usePathname();
-
-  // useEffect(() => {
-  //   setMounted(true);
-  // }, []);
-
-  // if (!mounted) return null;
+  const { data: session } = useSession();
 
   return (
     <SidebarGroup>
@@ -75,19 +71,21 @@ const DashboardSidebarGroup = () => {
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
-        <SidebarMenuItem>
-          <SidebarMenuButton
-            tooltip={"Manage Clerks"}
-            className="flex items-center"
-            asChild
-            isActive={pathName === "/dashboard/manage-clerks"}
-          >
-            <Link href={"/dashboard/manage-clerks"}>
-              <Car size={20} />
-              Manage Clerks
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+        {session?.user.role === "MANAGER" && (
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip={"Manage Clerks"}
+              className="flex items-center"
+              asChild
+              isActive={pathName === "/dashboard/manage-clerks"}
+            >
+              <Link href={"/dashboard/manage-clerks"}>
+                <Car size={20} />
+                Manage Clerks
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )}
       </SidebarMenu>
     </SidebarGroup>
   );
